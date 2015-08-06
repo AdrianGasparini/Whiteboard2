@@ -30,6 +30,8 @@ public abstract class SectionSnippet<Result>
 
     public Map<String, Notebook> notebookMap = new HashMap<>();
     public Map<String, Section> sectionMap = new HashMap<>();
+    public String mSiteCollectionId = null;
+    public String mSiteId = null;
 
     public SectionSnippet(Integer descriptionArray) {
         super(SnippetCategory.sectionsSnippetCategory, descriptionArray);
@@ -101,13 +103,16 @@ public abstract class SectionSnippet<Result>
 */
                     @Override
                     public void request(SectionsService service, Callback callback) {
+                        System.out.println("*** request");
 
                         Notebook notebook = notebookMap.get(callback
                                 .getParams()
                                 .get(SnippetDetailFragment.ARG_SPINNER_SELECTION).toString());
 
-                        service.getNotebookSections(
+                        service.getNotebookSectionsSP(
                                 getVersion(),
+                                mSiteCollectionId,
+                                mSiteId,
                                 notebook.id,
                                 null,
                                 null,
@@ -243,7 +248,11 @@ public abstract class SectionSnippet<Result>
             NotebooksService notebooksService,
             final retrofit.Callback<String[]> callback,
             final Map<String, Notebook> notebookMap) {
-        notebooksService.getNotebooks(getVersion(),
+        System.out.println("*** fillNotebookSpinner");
+        notebooksService.getNotebooksSP(getVersion(),
+                //notebooksService.getSharedNotebooks(getVersion(),
+                mSiteCollectionId,
+                mSiteId,
                 null,
                 null,
                 null,
@@ -280,6 +289,7 @@ public abstract class SectionSnippet<Result>
             final retrofit.Callback<String[]> callback,
             final Map<String, Section> sectionMap,
             String notebookId) {
+        System.out.println("*** fillSectionSpinner");
 /*
         sectionsService.getSections(
                 getVersion(),
@@ -290,8 +300,10 @@ public abstract class SectionSnippet<Result>
                 null,
                 null,
 */
-        sectionsService.getNotebookSections(
+        sectionsService.getNotebookSectionsSP(
                 getVersion(),
+                mSiteCollectionId,
+                mSiteId,
                 notebookId,
                 null,
                 null,
@@ -303,6 +315,7 @@ public abstract class SectionSnippet<Result>
 
                     @Override
                     public void success(Envelope<Section> envelope, Response response) {
+                        System.out.println("*** fillSectionSpinner success");
                         Section[] sections = envelope.value;
                         String[] sectionNames = new String[sections.length];
                         for (int i = 0; i < sections.length; i++) {
@@ -315,6 +328,7 @@ public abstract class SectionSnippet<Result>
 
                     @Override
                     public void failure(RetrofitError error) {
+                        System.out.println("*** fillSectionSpinner failure");
                     }
 
                     @Override

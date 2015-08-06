@@ -70,6 +70,22 @@ public interface SectionsService {
             Callback<Envelope<Section>> callback
     );
 
+    //@GET("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/sections")
+    @GET("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/notebooks/{notebookId}/sections")
+    void getNotebookSectionsSP(
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
+            @Path("notebookId") String Id,
+            @Query("filter") String filter,
+            @Query("orderby") String order,
+            @Query("select") String select,
+            @Query("top") Integer top,
+            @Query("skip") Integer skip,
+            @Query("search") String search,
+            Callback<Envelope<Section>> callback
+    );
+
     /**
      * POST to the sections resource
      *
@@ -82,6 +98,17 @@ public interface SectionsService {
     @POST("/{version}/me/notes/notebooks/{id}/sections")
     void postSection(
             @Path("version") String version,
+            @Header("Content-type") String contentTypeHeader,
+            @Path("id") String id,
+            @Body TypedString content,
+            Callback<Envelope> callback
+    );
+
+    @POST("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/notebooks/{id}/sections")
+    void postSectionSP(
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
             @Header("Content-type") String contentTypeHeader,
             @Path("id") String id,
             @Body TypedString content,

@@ -10,11 +10,13 @@ import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.PagesService;
 import com.microsoft.onenoteapi.service.SectionGroupsService;
 import com.microsoft.onenoteapi.service.SectionsService;
+import com.microsoft.onenoteapi.service.SiteMetadataService;
 
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.notebookSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.pagesSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sectionGroupsSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sectionsSnippetCategory;
+import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sitesSnippetCategory;
 
 /**
  * The base class for snippets
@@ -116,12 +118,14 @@ public abstract class AbstractSnippet<Service, Result> {
         public final PagesService mPagesService;
         public final SectionGroupsService mSectionGroupsService;
         public final SectionsService mSectionsService;
+        public final SiteMetadataService mSiteMetadataService;
 
         Services() {
             mNotebooksService = notebookSnippetCategory.mService;
             mPagesService = pagesSnippetCategory.mService;
             mSectionGroupsService = sectionGroupsSnippetCategory.mService;
             mSectionsService = sectionsSnippetCategory.mService;
+            mSiteMetadataService = sitesSnippetCategory.mService;
         }
     }
 

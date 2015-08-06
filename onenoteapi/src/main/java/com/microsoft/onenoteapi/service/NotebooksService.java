@@ -41,6 +41,20 @@ public interface NotebooksService {
             Callback<Envelope<Notebook>> callback
     );
 
+    @GET("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/notebooks")
+    void getNotebooksSP(
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
+            @Query("$filter") String filter,
+            @Query("$orderby") String order,
+            @Query("$select") String select,
+            @Query("$expand") String expand,
+            @Query("$top") Integer top,
+            @Query("$skip") Integer skip,
+            Callback<Envelope<Notebook>> callback
+    );
+
     /**
      * Gets all of the notebooks owned by other users and shared
      * with the signed in user

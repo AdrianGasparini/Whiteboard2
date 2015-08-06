@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +56,7 @@ import com.microsoft.onenotevos.Links;
 import com.microsoft.onenotevos.Notebook;
 import com.microsoft.onenotevos.Page;
 import com.microsoft.onenotevos.Section;
+import com.microsoft.onenotevos.SiteMetadata;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -131,6 +133,8 @@ public class SnippetDetailFragment<T, Result>
     //Callback mCallback = this;
     String mSectionName = null;
     String mOneNoteClientUrl = null;
+    //String mSiteCollectionId = null;
+    //String mSiteId = null;
 
     @InjectView(txt_status_code)
     protected TextView mStatusCode;
@@ -495,8 +499,11 @@ public class SnippetDetailFragment<T, Result>
                 mSectionName = input.getText().toString();
                 System.out.println("*** New section name: " + mSectionName);
 
-                AbstractSnippet.sServices.mSectionsService.postSection(
+                SectionSnippet item = (SectionSnippet)mItem;
+                AbstractSnippet.sServices.mSectionsService.postSectionSP(
                         mItem.getVersion(),
+                        item.mSiteCollectionId,
+                        item.mSiteId,
                         "application/json",
                         mNotebookId,
                         createNewSection(mSectionName),
@@ -506,6 +513,7 @@ public class SnippetDetailFragment<T, Result>
                             public void success(Envelope env, Response response) {
                                 //mProgressbar.setVisibility(View.GONE);
                                 //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
+                                System.out.println("*** postSection success");
                                 System.out.println("*** Fetching sections");
                                 SectionSnippet item = (SectionSnippet) mItem;
                                 item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
@@ -523,6 +531,7 @@ public class SnippetDetailFragment<T, Result>
 
                             @Override
                             public void failure(RetrofitError error) {
+                                System.out.println("*** postSection failure");
                                 if (isAdded()) {
                                     displayThrowable(error.getCause());
                                     mProgressbar.setVisibility(View.GONE);
@@ -568,6 +577,41 @@ public class SnippetDetailFragment<T, Result>
 
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(androidClientUrl));
         startActivity(browserIntent);
+    }
+
+    @OnClick(btn_launch_browser)
+    public void onLaunchBrowserClicked(Button btn) {
+        System.out.println("*** onLaunchBrowserClicked");
+        AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
+                mItem.getVersion(),
+                "https://fcpkag.sharepoint.com/Site2",
+                //(Callback<Envelope<Page>>)this
+                //new retrofit.Callback<Envelope<SiteMetadata>>() {
+                new retrofit.Callback<SiteMetadata>() {
+                    @Override
+                    //public void success(Envelope<SiteMetadata> env, Response response) {
+                    public void success(SiteMetadata data, Response response) {
+                        //mProgressbar.setVisibility(View.GONE);
+                        //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
+                        System.out.println("*** Received site metadata");
+                        //System.out.println("Site Collection ID and Site ID: " + env.value[0].siteCollectionId + " " + env.value[0].siteId);
+                        System.out.println("Site Collection ID and Site ID: " + data.siteCollectionId + " " + data.siteId);
+                        SectionSnippet item = (SectionSnippet)mItem;
+                        item.mSiteCollectionId = data.siteCollectionId;
+                        item.mSiteId = data.siteId;
+                        //}
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** Error receiving site metadata");
+                        if (isAdded()) {
+                            displayThrowable(error.getCause());
+                            mProgressbar.setVisibility(View.GONE);
+                        }
+                    }
+                }
+        );
     }
 
     @OnClick(txt_hyperlink)
@@ -636,6 +680,52 @@ public class SnippetDetailFragment<T, Result>
                 activity.getSupportActionBar().setTitle(mItem.getName());
             }
         }
+
+        System.out.println("*** onActivityCreated");
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        System.out.println("*** Sync invocation");
+        SiteMetadata data = AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadataSync(
+                mItem.getVersion(),
+                "https://fcpkag.sharepoint.com/Site2");
+        System.out.println("*** Received site metadata");
+        System.out.println("*** Site Collection ID and Site ID: " + data.siteCollectionId + " " + data.siteId);
+        SectionSnippet item = (SectionSnippet)mItem;
+        item.mSiteCollectionId = data.siteCollectionId;
+        item.mSiteId = data.siteId;
+
+/*
+        AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
+                mItem.getVersion(),
+                "https://fcpkag.sharepoint.com/Site2",
+                //(Callback<Envelope<Page>>)this
+                //new retrofit.Callback<Envelope<SiteMetadata>>() {
+                new retrofit.Callback<SiteMetadata>() {
+                    @Override
+                    //public void success(Envelope<SiteMetadata> env, Response response) {
+                    public void success(SiteMetadata data, Response response) {
+                        //mProgressbar.setVisibility(View.GONE);
+                        //if (isAdded() && (null == response)) {
+                        System.out.println("*** Received site metadata");
+                        //System.out.println("Site Collection ID and Site ID: " + env.value[0].siteCollectionId + " " + env.value[0].siteId);
+                        System.out.println("Site Collection ID and Site ID: " + data.siteCollectionId + " " + data.siteId);
+                        SectionSnippet item = (SectionSnippet)mItem;
+                        item.mSiteCollectionId = data.siteCollectionId;
+                        item.mSiteId = data.siteId;
+                        //}
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** Error receiving site metadata");
+                        if (isAdded()) {
+                            displayThrowable(error.getCause());
+                            mProgressbar.setVisibility(View.GONE);
+                        }
+                    }
+                }
+        );
+*/
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.PagesService;
 import com.microsoft.onenoteapi.service.SectionGroupsService;
 import com.microsoft.onenoteapi.service.SectionsService;
+import com.microsoft.onenoteapi.service.SiteMetadataService;
 
 import static com.microsoft.o365_android_onenote_rest.R.string.section_notebooks;
 import static com.microsoft.o365_android_onenote_rest.R.string.section_pages;
@@ -27,6 +28,9 @@ public class SnippetCategory<T> {
 
     static final SnippetCategory<SectionsService> sectionsSnippetCategory
             = new SnippetCategory<>(section_sections, create(SectionsService.class));
+
+    static final SnippetCategory<SiteMetadataService> sitesSnippetCategory
+            = new SnippetCategory<>(section_sections, create(SiteMetadataService.class)); /* TODO: section_sites !!! */
 
     final String mSection;
     final T mService;
