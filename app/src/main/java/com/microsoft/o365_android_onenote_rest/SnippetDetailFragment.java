@@ -254,11 +254,15 @@ public class SnippetDetailFragment<T, Result>
         mOpenOneNoteButton.setEnabled(false);
 
         System.out.println("*** Notebook id: " + mNotebookId);
+        // TODO: uncomment if section id should not be read on spinner selection
+        /*
         System.out.println("*** Section: " + mSpinner2.getSelectedItem().toString());
         SectionSnippet item = (SectionSnippet)mItem;
         Section section = (Section) item.sectionMap.get(mSpinner2.getSelectedItem().toString());
         System.out.println("*** Section id: " + section.id);
         mSectionId = section.id;
+        */
+        System.out.println("*** Section id: " + mSectionId);
 
         //File photoFile = null;
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -383,8 +387,11 @@ public class SnippetDetailFragment<T, Result>
             TypedFile typedFile = new TypedFile("image/jpg", mPhotoFile);
             oneNotePartsMap.put(imagePartName, typedFile);
 
-            AbstractSnippet.sServices.mPagesService.postMultiPartPages(
+            SectionSnippet item = (SectionSnippet)mItem;
+            AbstractSnippet.sServices.mPagesService.postMultiPartPagesSP(
                     mItem.getVersion(),
+                    item.mSiteCollectionId,
+                    item.mSiteId,
                     mSectionId,
                     oneNotePartsMap,
                     //(Callback<Envelope<Page>>)this
@@ -514,6 +521,8 @@ public class SnippetDetailFragment<T, Result>
                                 //mProgressbar.setVisibility(View.GONE);
                                 //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
                                 System.out.println("*** postSection success");
+                                mSectionId = env.id;
+                                System.out.println("*** Section ID: " + mSectionId);
                                 System.out.println("*** Fetching sections");
                                 SectionSnippet item = (SectionSnippet) mItem;
                                 item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
@@ -596,7 +605,7 @@ public class SnippetDetailFragment<T, Result>
                         System.out.println("*** Received site metadata");
                         //System.out.println("Site Collection ID and Site ID: " + env.value[0].siteCollectionId + " " + env.value[0].siteId);
                         System.out.println("Site Collection ID and Site ID: " + data.siteCollectionId + " " + data.siteId);
-                        SectionSnippet item = (SectionSnippet)mItem;
+                        SectionSnippet item = (SectionSnippet) mItem;
                         item.mSiteCollectionId = data.siteCollectionId;
                         item.mSiteId = data.siteId;
                         //}
@@ -630,6 +639,16 @@ public class SnippetDetailFragment<T, Result>
         mNotebookId = notebook.id;
 
         item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback2(), item.sectionMap, notebook.id);
+    }
+
+    // TODO: remove if section id should not be read on spinner selection
+    @OnItemSelected(spinner2)
+    public void onSpinner2ItemSelected(Spinner theSpinner) {
+        System.out.println("*** Section: " + mSpinner2.getSelectedItem().toString());
+        SectionSnippet item = (SectionSnippet)mItem;
+        Section section = (Section) item.sectionMap.get(mSpinner2.getSelectedItem().toString());
+        System.out.println("*** Section id: " + section.id);
+        mSectionId = section.id;
     }
 
     private void launchUri(Uri uri) {
@@ -826,6 +845,7 @@ public class SnippetDetailFragment<T, Result>
 
             @Override
             public void failure(RetrofitError error) {
+                System.out.println("*** Callback3 failure");
                 if (isAdded()) {
                     displayThrowable(error.getCause());
                     mProgressbar.setVisibility(View.GONE);

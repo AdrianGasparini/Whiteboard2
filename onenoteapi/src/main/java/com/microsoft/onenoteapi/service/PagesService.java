@@ -154,13 +154,24 @@ public interface PagesService {
             Callback<Envelope<Page>> callback
     );
 
+    @Multipart
+    @POST("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/sections/{sectionId}/pages")
+    void postMultiPartPagesSP(
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
+            @Path("sectionId") String sectionId,
+            @PartMap OneNotePartsMap partMap,
+            Callback<Envelope<Page>> callback
+    );
+
     /**
-     * Deletes the specified page
-     *
-     * @param version
-     * @param pageId
-     * @param callback
-     */
+      * Deletes the specified page
+      *
+      * @param version
+      * @param pageId
+      * @param callback
+      */
     @DELETE("/{version}/me/notes/pages/{pageId}")
     void deletePage(
             @Path("version") String version,
