@@ -53,6 +53,7 @@ public class AuthenticationManager {
     }
 
     public void connect(AuthenticationCallback<AuthenticationResult> authenticationCallback) {
+        //authenticatePrompt(authenticationCallback); // TODO: remove
         if (isConnected()) {
             authenticateSilent(authenticationCallback);
         } else {

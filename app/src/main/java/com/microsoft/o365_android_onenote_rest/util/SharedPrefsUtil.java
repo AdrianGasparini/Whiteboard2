@@ -14,6 +14,7 @@ import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 public class SharedPrefsUtil {
 
     public static final String PREF_AUTH_TOKEN = "PREF_AUTH_TOKEN";
+    public static final String PREF_AUTH_TOKEN2 = "PREF_AUTH_TOKEN2";
 
     public static SharedPreferences getSharedPreferences() {
         return SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -31,6 +32,21 @@ public class SharedPrefsUtil {
 
     private static void setAccessToken(String accessToken) {
         getSharedPreferences().edit().putString(PREF_AUTH_TOKEN, accessToken).commit();
+    }
+
+
+    public static void persistAuthToken2(AuthenticationResult result) {
+        setAccessToken2(result.getAccessToken());
+        User.isOrg(true);
+    }
+
+    public static void persistAuthToken2(LiveConnectSession session) {
+        setAccessToken2(session.getAccessToken());
+        User.isMsa(true);
+    }
+
+    private static void setAccessToken2(String accessToken) {
+        getSharedPreferences().edit().putString(PREF_AUTH_TOKEN2, accessToken).commit();
     }
 }
 // *********************************************************

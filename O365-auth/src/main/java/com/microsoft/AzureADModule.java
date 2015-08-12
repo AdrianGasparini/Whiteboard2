@@ -33,7 +33,9 @@ public class AzureADModule {
 
         private String
                 mAuthorityUrl, // the authority used to authenticate
-                mAuthenticationResourceId, // the resource id used to authenticate
+                //mAuthenticationResourceId, // the resource id used to authenticate
+                mAuthenticationResourceId1,
+                mAuthenticationResourceId2,
                 mSharedPreferencesFilename = SHARED_PREFS_DEFAULT_NAME,
                 mClientId,
                 mRedirectUri;
@@ -48,11 +50,17 @@ public class AzureADModule {
             mAuthorityUrl = authorityUrl;
             return this;
         }
-
+/*
         public Builder authenticationResourceId(String authenticationResourceId) {
             mAuthenticationResourceId = authenticationResourceId;
             return this;
         }
+*/
+public Builder authenticationResourceId(String authenticationResourceId1, String authenticationResourceId2) {
+    mAuthenticationResourceId1 = authenticationResourceId1;
+    mAuthenticationResourceId2 = authenticationResourceId2;
+    return this;
+}
 
         public Builder validateAuthority(boolean shouldEvaluate) {
             mValidateAuthority = shouldEvaluate;
@@ -83,7 +91,7 @@ public class AzureADModule {
             if (null == mAuthorityUrl) {
                 throw new IllegalStateException("authorityUrl() is unset");
             }
-            if (null == mAuthenticationResourceId) {
+            if (null == mAuthenticationResourceId1) {
                 throw new IllegalStateException("authenticationResourceId() is unset");
             }
             if (null == mSharedPreferencesFilename) {
@@ -103,7 +111,7 @@ public class AzureADModule {
     public static void skipBroker(boolean shouldSkip) {
         AuthenticationSettings.INSTANCE.setSkipBroker(shouldSkip);
     }
-
+/*
     @Provides
     public AuthenticationContext providesAuthenticationContext() {
         try {
@@ -115,7 +123,51 @@ public class AzureADModule {
             throw new RuntimeException(e);
         }
     }
+*/
 
+    @Provides
+    public AuthenticationContexts providesAuthenticationContexts() {
+        try {
+            AuthenticationContexts cs = new AuthenticationContexts();
+            cs.mAuthenticationContext1 = new AuthenticationContext(
+                    mBuilder.mActivity,
+                    mBuilder.mAuthorityUrl,
+                    mBuilder.mValidateAuthority);
+            cs.mAuthenticationContext2 = new AuthenticationContext(
+                    mBuilder.mActivity,
+                    mBuilder.mAuthorityUrl,
+                    mBuilder.mValidateAuthority);
+            return cs;
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Provides
+    public AuthenticationManagers providesAuthenticationManagers(
+            /*AuthenticationContext authenticationContext*/
+            AuthenticationContexts authenticationContexts) {
+        AuthenticationManagers ms = new AuthenticationManagers();
+        ms.mAuthenticationManager1 = new AuthenticationManager(
+                mBuilder.mActivity,
+                //authenticationContext,
+                authenticationContexts.mAuthenticationContext1,
+                mBuilder.mAuthenticationResourceId1,
+                mBuilder.mSharedPreferencesFilename,
+                mBuilder.mClientId,
+                mBuilder.mRedirectUri);
+        ms.mAuthenticationManager2 = new AuthenticationManager(
+                mBuilder.mActivity,
+                //authenticationContext,
+                authenticationContexts.mAuthenticationContext2,
+                mBuilder.mAuthenticationResourceId2,
+                mBuilder.mSharedPreferencesFilename,
+                mBuilder.mClientId,
+                mBuilder.mRedirectUri);
+        return ms;
+    }
+
+/*
     @Provides
     public AuthenticationManager providesAuthenticationManager(
             AuthenticationContext authenticationContext) {
@@ -127,7 +179,7 @@ public class AzureADModule {
                 mBuilder.mClientId,
                 mBuilder.mRedirectUri);
     }
-
+*/
 }
 // *********************************************************
 //

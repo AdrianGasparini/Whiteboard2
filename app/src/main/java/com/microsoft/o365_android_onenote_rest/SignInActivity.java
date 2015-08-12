@@ -36,7 +36,9 @@ public class SignInActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
         if (User.isOrg()) {
-            mAuthenticationManager.connect(this);
+            //mAuthenticationManager.connect(this);
+            mAuthenticationManagers.mAuthenticationManager1.connect(this);
+            mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
         }
         ButterKnife.inject(this);
     }
@@ -57,6 +59,22 @@ public class SignInActivity
                 .show();
     }
 
+    AuthenticationCallback<AuthenticationResult> getAuthenticationCallback() {
+        return new AuthenticationCallback<AuthenticationResult>() {
+            @Override
+            public void onSuccess(AuthenticationResult authenticationResult) {
+                finish();
+                SharedPrefsUtil.persistAuthToken2(authenticationResult);
+                start();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                System.out.println("*** SignInActivity onError: " + e);
+            }
+        };
+    }
+
     private void authenticateOrganization() throws IllegalArgumentException {
         validateOrganizationArgs();
         if (!User.isOrg()) {
@@ -65,16 +83,22 @@ public class SignInActivity
                 public void onAuthComplete(LiveStatus status,
                                            LiveConnectSession session,
                                            Object userState) {
-                    mAuthenticationManager.connect(SignInActivity.this);
+                    //mAuthenticationManager.connect(SignInActivity.this);
+                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
+                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
                 }
 
                 @Override
                 public void onAuthError(LiveAuthException exception, Object userState) {
-                    mAuthenticationManager.connect(SignInActivity.this);
+                    //mAuthenticationManager.connect(SignInActivity.this);
+                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
+                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
                 }
             });
         } else {
-            mAuthenticationManager.connect(this);
+            //mAuthenticationManager.connect(this);
+            mAuthenticationManagers.mAuthenticationManager1.connect(this);
+            mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
         }
     }
 

@@ -34,6 +34,9 @@ import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.microsoft.AuthenticationManager;
+import com.microsoft.AuthenticationManagers;
+import com.microsoft.AzureADModule;
+import com.microsoft.AzureAppCompatActivity;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.live.LiveAuthClient;
@@ -42,6 +45,7 @@ import com.microsoft.live.LiveAuthListener;
 import com.microsoft.live.LiveConnectSession;
 import com.microsoft.live.LiveStatus;
 import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
 import com.microsoft.o365_android_onenote_rest.snippet.Callback;
 import com.microsoft.o365_android_onenote_rest.snippet.Input;
@@ -50,6 +54,7 @@ import com.microsoft.o365_android_onenote_rest.snippet.SnippetContent;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.o365_android_onenote_rest.util.User;
 import com.microsoft.onenoteapi.service.OneNotePartsMap;
+import com.microsoft.onenoteapi.service.SiteMetadataService;
 import com.microsoft.onenotevos.BaseVO;
 import com.microsoft.onenotevos.Envelope;
 import com.microsoft.onenotevos.Links;
@@ -57,6 +62,7 @@ import com.microsoft.onenotevos.Notebook;
 import com.microsoft.onenotevos.Page;
 import com.microsoft.onenotevos.Section;
 import com.microsoft.onenotevos.SiteMetadata;
+import com.microsoft.sharepoint.service.SitesService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -81,6 +87,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
+import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
@@ -97,6 +104,7 @@ import static com.microsoft.o365_android_onenote_rest.R.id.btn_open_onenote;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_new_section;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_run;
 import static com.microsoft.o365_android_onenote_rest.R.id.progressbar;
+import static com.microsoft.o365_android_onenote_rest.R.id.spinner0;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner2;
 import static com.microsoft.o365_android_onenote_rest.R.id.txt_desc;
@@ -120,7 +128,7 @@ public class SnippetDetailFragment<T, Result>
     public static final String ARG_ITEM_ID = "item_id";
     public static final String ARG_TEXT_INPUT = "TextInput";
     public static final String ARG_SPINNER_SELECTION = "SpinnerSelection";
-    public static final String ARG_SPINNER2_SELECTION = "Spinner2Selection";
+    //public static final String ARG_SPINNER2_SELECTION = "Spinner2Selection";
     public static final int UNSET = -1;
     public static final String APP_STORE_URI = "https://play.google.com/store/apps/details?id=com.microsoft.office.onenote";
 
@@ -154,6 +162,9 @@ public class SnippetDetailFragment<T, Result>
     @InjectView(txt_response_body)
     protected TextView mResponseBody;
 
+    @InjectView(spinner0)
+    protected Spinner mSpinner0;
+
     @InjectView(spinner)
     protected Spinner mSpinner;
 
@@ -176,7 +187,10 @@ public class SnippetDetailFragment<T, Result>
     protected Button mOpenOneNoteButton;
 
     @Inject
-    protected AuthenticationManager mAuthenticationManager;
+    public AuthenticationManagers mAuthenticationManagers;
+
+    //@Inject
+    //protected AuthenticationManager mAuthenticationManager;
 
     @Inject
     protected LiveAuthClient mLiveAuthClient;
@@ -703,7 +717,44 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** onActivityCreated");
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        System.out.println("*** Sync invocation");
+/*
+        AzureADModule.Builder builder = new AzureADModule.Builder(mActivity);
+        builder.validateAuthority(true)
+                .skipBroker(true)
+                .authenticationResourceId("https://fcpkag.sharepoint.com")
+                .authorityUrl(ServiceConstants.AUTHORITY_URL)
+                .redirectUri(ServiceConstants.REDIRECT_URI)
+                .clientId(ServiceConstants.CLIENT_ID);
+        AzureADModule sharePointADModule = builder.build();
+*/
+
+//        ((AzureAppCompatActivity)mActivity).forSharePoint = true;
+/*
+        System.out.println("*** Calling SitesService synchronously");
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("https://fcpkag.sharepoint.com")
+                .setLogLevel(SnippetApp.getApp().logLevel)
+                //.setConverter(SnippetApp.getApp().converter)
+                .setRequestInterceptor(SnippetApp.getApp().requestInterceptor)
+                .build();
+        SitesService sitesService = restAdapter.create(SitesService.class);
+        Envelope env = sitesService.getFollowedSitesSync();
+        System.out.println("*** Envelope: " + env.toString());
+*/
+
+        System.out.println("*** Calling SitesService synchronously");
+        RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
+        SitesService sitesService = restAdapter.create(SitesService.class);
+        Envelope env = sitesService.getFollowedSitesSync();
+        System.out.println("*** Envelope: " + env.toString());
+
+/*
+        ((AzureAppCompatActivity)mActivity).forSharePoint = false;
+        mAuthenticationManager.disconnect();
+        ((AzureAppCompatActivity)mActivity).doAgain();
+        onResume();
+*/
+        System.out.println("*** Sync invocation of SiteMetadataService");
         SiteMetadata data = AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadataSync(
                 mItem.getVersion(),
                 "https://fcpkag.sharepoint.com/Site2");
@@ -751,7 +802,20 @@ public class SnippetDetailFragment<T, Result>
     public void onResume() {
         super.onResume();
         if (User.isOrg()) {
-            mAuthenticationManager.connect(this);
+            //mAuthenticationManager.connect(this);
+            mAuthenticationManagers.mAuthenticationManager1.connect(this);
+            mAuthenticationManagers.mAuthenticationManager2.connect(new AuthenticationCallback<AuthenticationResult>() {
+                @Override
+                public void onSuccess(AuthenticationResult authenticationResult) {
+                    SharedPrefsUtil.persistAuthToken2(authenticationResult);
+                    ready();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    System.out.println("*** onError: " + e);
+                }
+            });
         } else if (User.isMsa()) {
             mLiveAuthClient.loginSilent(BaseActivity.sSCOPES, this);
         }
@@ -1057,7 +1121,9 @@ public class SnippetDetailFragment<T, Result>
                 .setNegativeButton(R.string.disconnect, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mAuthenticationManager.disconnect();
+                        //mAuthenticationManager.disconnect();
+                        mAuthenticationManagers.mAuthenticationManager1.disconnect();
+                        mAuthenticationManagers.mAuthenticationManager2.disconnect();
                     }
                 }).show();
     }

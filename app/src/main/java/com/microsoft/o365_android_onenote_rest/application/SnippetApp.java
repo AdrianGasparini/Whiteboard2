@@ -8,6 +8,7 @@ import android.app.Application;
 
 import com.microsoft.o365_android_onenote_rest.BuildConfig;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
+import com.microsoft.o365_android_onenote_rest.inject.RequestInterceptors;
 
 import javax.inject.Inject;
 
@@ -33,13 +34,16 @@ public class SnippetApp extends Application {
     protected String endpoint;
 
     @Inject
-    protected Converter converter;
+    public Converter converter;
 
     @Inject
-    protected RestAdapter.LogLevel logLevel;
+    public RestAdapter.LogLevel logLevel;
+
+    //@Inject
+    //public RequestInterceptor requestInterceptor;
 
     @Inject
-    protected RequestInterceptor requestInterceptor;
+    public RequestInterceptors mRequestInterceptors;
 
     @Override
     public void onCreate() {
@@ -55,7 +59,7 @@ public class SnippetApp extends Application {
     public static SnippetApp getApp() {
         return sSnippetApp;
     }
-
+/*
     public RestAdapter getRestAdapter() {
         return new RestAdapter.Builder()
                 .setEndpoint(endpoint)
@@ -64,6 +68,25 @@ public class SnippetApp extends Application {
                 .setRequestInterceptor(requestInterceptor)
                 .build();
     }
+*/
+    public RestAdapter getRestAdapter() {
+        return new RestAdapter.Builder()
+                .setEndpoint(endpoint)
+                .setLogLevel(logLevel)
+                .setConverter(converter)
+                .setRequestInterceptor(mRequestInterceptors.requestInterceptor1)
+                .build();
+    }
+
+    public RestAdapter getRestAdapter2() {
+        return new RestAdapter.Builder()
+                .setEndpoint("https://fcpkag.sharepoint.com")   // TODO: change
+                .setLogLevel(logLevel)
+                .setConverter(converter)
+                .setRequestInterceptor(mRequestInterceptors.requestInterceptor2)
+                .build();
+    }
+
 }
 // *********************************************************
 //

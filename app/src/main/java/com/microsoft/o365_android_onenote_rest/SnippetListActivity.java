@@ -76,7 +76,9 @@ public class SnippetListActivity extends BaseActivity
         finish();
 
         if (User.isOrg()) {
-            mAuthenticationManager.disconnect();
+            //mAuthenticationManager.disconnect();
+            mAuthenticationManagers.mAuthenticationManager1.disconnect();
+            mAuthenticationManagers.mAuthenticationManager2.disconnect();
         } else if (User.isMsa()) {
             mLiveAuthClient.logout(null);
         }

@@ -46,8 +46,8 @@ public class AppModule {
         return new GsonConverter(GsonDateTime.getOneNoteBuilder()
                 .create());
     }
-
-    @Provides
+/*
+    @Provides()
     public RequestInterceptor providesRequestInterceptor() {
         return new RequestInterceptor() {
             @Override
@@ -63,6 +63,40 @@ public class AppModule {
             }
         };
     }
+*/
+@Provides()
+public RequestInterceptors providesRequestInterceptor() {
+    RequestInterceptors is = new RequestInterceptors();
+    is.requestInterceptor1 = new RequestInterceptor() {
+        @Override
+        public void intercept(RequestFacade request) {
+            // apply the Authorization header if we had a token...
+            final SharedPreferences preferences
+                    = SnippetApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            final String token =
+                    preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN, null);
+            System.out.println("*** token1: " + token);
+            if (null != token) {
+                request.addHeader("Authorization", "Bearer " + token);
+            }
+        }
+    };
+    is.requestInterceptor2 = new RequestInterceptor() {
+        @Override
+        public void intercept(RequestFacade request) {
+            // apply the Authorization header if we had a token...
+            final SharedPreferences preferences
+                    = SnippetApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            final String token =
+                    preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN2, null);
+            System.out.println("*** token2: " + token);
+            if (null != token) {
+                request.addHeader("Authorization", "Bearer " + token);
+            }
+        }
+    };
+    return is;
+}
 
     @Provides
     @Singleton
