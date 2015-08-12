@@ -1,6 +1,7 @@
 package com.microsoft.sharepoint.service;
 
 import com.microsoft.onenotevos.Envelope;
+import com.microsoft.sharepointvos.FollowedSites;
 
 import retrofit.Callback;
 import retrofit.http.GET;
@@ -23,6 +24,6 @@ public interface SitesService {
     @GET("/_api/social.following/my/followed(types=4)")
     //@POST("/_api/sp.userprofiles.profileloader.getprofileloader/getuserprofile/FollowedContent")
     //@POST("/_api/sp.userprofiles.profileloader.getprofileloader/getuserprofile/FollowedSitesUrl")
-    Envelope getFollowedSitesSync(
+    Envelope<FollowedSites> getFollowedSitesSync(
     );
 }

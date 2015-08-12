@@ -63,6 +63,7 @@ import com.microsoft.onenotevos.Page;
 import com.microsoft.onenotevos.Section;
 import com.microsoft.onenotevos.SiteMetadata;
 import com.microsoft.sharepoint.service.SitesService;
+import com.microsoft.sharepointvos.FollowedSites;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -745,8 +746,9 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** Calling SitesService synchronously");
         RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
         SitesService sitesService = restAdapter.create(SitesService.class);
-        Envelope env = sitesService.getFollowedSitesSync();
+        Envelope<FollowedSites> env = sitesService.getFollowedSitesSync();
         System.out.println("*** Envelope: " + env.toString());
+        //System.out.println("*** Followed site: " + env.value[0].getD().getFollowed().getResults().get(0).getName());
 
 /*
         ((AzureAppCompatActivity)mActivity).forSharePoint = false;
