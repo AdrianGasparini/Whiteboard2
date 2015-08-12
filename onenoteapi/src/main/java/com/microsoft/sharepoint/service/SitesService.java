@@ -17,7 +17,7 @@ public interface SitesService {
     @Headers("accept: application/json;odata=verbose")
     @GET("/_api/social.following/my/followed(types=4)")
     void getFollowedSites(
-            Callback<Envelope> callback
+            Callback<FollowedSites> callback
     );
 
     @Headers("accept: application/json;odata=verbose")

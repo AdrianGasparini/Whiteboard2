@@ -643,13 +643,60 @@ public class SnippetDetailFragment<T, Result>
         launchUri(Uri.parse(mItem.getUrl()));
     }
 
+    @OnItemSelected(spinner0)
+    public void onSpinner0ItemSelected(Spinner theSpinner) {
+        System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
+
+        SectionSnippet item = (SectionSnippet)mItem;
+        //com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(this
+        //        .getParams()
+        //        .get(SnippetDetailFragment.ARG_SPINNER_SELECTION).toString());
+        com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(
+                theSpinner.getSelectedItem().toString());
+        System.out.println("*** Site URI: " + result.getUri());
+/*
+        System.out.println("*** Sync invocation of SiteMetadataService");
+        SiteMetadata data = AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadataSync(
+                mItem.getVersion(),
+                result.getUri());
+        System.out.println("*** Received site metadata");
+        System.out.println("*** Site Collection ID and Site ID: " + data.siteCollectionId + " " + data.siteId);
+        item.mSiteCollectionId = data.siteCollectionId;
+        item.mSiteId = data.siteId;
+
+        item.fillNotebookSpinner(AbstractSnippet.sServices.mNotebooksService, getSetUpCallback(), item.notebookMap);
+*/
+        System.out.println("*** Async invocation of SiteMetadataService");
+        AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
+                mItem.getVersion(),
+                result.getUri(),
+                new retrofit.Callback<SiteMetadata>() {
+                    @Override
+                    public void success(SiteMetadata siteMetadata, Response response) {
+                        System.out.println("*** Received site metadata");
+                        System.out.println("*** Site Collection ID and Site ID: " + siteMetadata.siteCollectionId + " " + siteMetadata.siteId);
+                        SectionSnippet item = (SectionSnippet)mItem;
+                        item.mSiteCollectionId = siteMetadata.siteCollectionId;
+                        item.mSiteId = siteMetadata.siteId;
+                        item.fillNotebookSpinner(AbstractSnippet.sServices.mNotebooksService, getSetUpCallback(), item.notebookMap);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** Failure receiving site metadata");
+                    }
+                }
+        );
+    }
+
     @OnItemSelected(spinner)
     public void onSpinnerItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
         SectionSnippet item = (SectionSnippet)mItem;
-        Notebook notebook = (Notebook) item.notebookMap.get(this
-                .getParams()
-                .get(SnippetDetailFragment.ARG_SPINNER_SELECTION).toString());
+        //Notebook notebook = (Notebook) item.notebookMap.get(this
+        //        .getParams()
+        //        .get(SnippetDetailFragment.ARG_SPINNER_SELECTION).toString());
+        Notebook notebook = (Notebook) item.notebookMap.get(theSpinner.getSelectedItem().toString());
         System.out.println("*** Notebook id: " + notebook.id);
         mNotebookId = notebook.id;
 
@@ -694,6 +741,7 @@ public class SnippetDetailFragment<T, Result>
         ButterKnife.inject(this, rootView);
         mSnippetDescription.setText(mItem.getDescription());
         if (Input.Spinner == mItem.mInputArgs) {
+            mSpinner0.setVisibility(VISIBLE);
             mSpinner.setVisibility(VISIBLE);
             mSpinner2.setVisibility(VISIBLE);
         } else if (Input.Text == mItem.mInputArgs) {
@@ -742,27 +790,21 @@ public class SnippetDetailFragment<T, Result>
         Envelope env = sitesService.getFollowedSitesSync();
         System.out.println("*** Envelope: " + env.toString());
 */
-
+        /*
         System.out.println("*** Calling SitesService synchronously");
         RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
         SitesService sitesService = restAdapter.create(SitesService.class);
         FollowedSites followedSites = sitesService.getFollowedSitesSync();
-        //System.out.println("*** Envelope: " + env.toString());
         for(int j = 0; j < followedSites.getD().getFollowed().getResults().size(); j++)
             System.out.println("*** Followed site: " + followedSites.getD().getFollowed().getResults().get(j).getName());
-
-        //System.out.println("*** Followed site: " + env.value[0].getD().getFollowed().getResults().get(0).getName());
-        //for(int i = 0; i < env.value.length; i++) {
-        //    for(int j = 0; j < env.value[i].getD().getFollowed().getResults().size(); j++)
-        //        System.out.println("*** Followed site: " + env.value[i].getD().getFollowed().getResults().get(j).getName());
-        //}
-
+        */
 /*
         ((AzureAppCompatActivity)mActivity).forSharePoint = false;
         mAuthenticationManager.disconnect();
         ((AzureAppCompatActivity)mActivity).doAgain();
         onResume();
 */
+        /*
         System.out.println("*** Sync invocation of SiteMetadataService");
         SiteMetadata data = AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadataSync(
                 mItem.getVersion(),
@@ -772,7 +814,7 @@ public class SnippetDetailFragment<T, Result>
         SectionSnippet item = (SectionSnippet)mItem;
         item.mSiteCollectionId = data.siteCollectionId;
         item.mSiteId = data.siteId;
-
+        */
 /*
         AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
                 mItem.getVersion(),
@@ -830,10 +872,41 @@ public class SnippetDetailFragment<T, Result>
         }
     }
 
+    private retrofit.Callback<String[]> getSetUpCallback0() {
+        return new retrofit.Callback<String[]>() {
+            @Override
+            public void success(String[] strings, Response response) {
+                System.out.println("*** Callback0 success");
+                mProgressbar.setVisibility(View.GONE);
+                if (isAdded() && (null == response || strings.length > 0)) {
+                    //mRunButton.setEnabled(true);
+                    if (strings.length > 0) {
+                        populateSpinner0(strings);
+                    }
+                } else if (isAdded() && strings.length <= 0 && null != response) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(R.string.err_setup)
+                            .setMessage(R.string.err_setup_msg)
+                            .setPositiveButton(R.string.dismiss, null)
+                            .show();
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (isAdded()) {
+                    displayThrowable(error.getCause());
+                    mProgressbar.setVisibility(View.GONE);
+                }
+            }
+        };
+    }
+
     private retrofit.Callback<String[]> getSetUpCallback() {
         return new retrofit.Callback<String[]>() {
             @Override
             public void success(String[] strings, Response response) {
+                System.out.println("*** Callback1 success");
                 mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     mRunButton.setEnabled(true);
@@ -863,6 +936,7 @@ public class SnippetDetailFragment<T, Result>
         return new retrofit.Callback<String[]>() {
             @Override
             public void success(String[] strings, Response response) {
+                System.out.println("*** Callback2 success");
                 mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     mRunButton.setEnabled(true);
@@ -927,6 +1001,16 @@ public class SnippetDetailFragment<T, Result>
         };
     }
 
+
+    private void populateSpinner0(String[] strings) {
+        ArrayAdapter<String> spinnerArrayAdapter
+                = new ArrayAdapter<>(
+                getActivity(),
+                simple_spinner_item,
+                strings);
+        spinnerArrayAdapter.setDropDownViewResource(simple_spinner_dropdown_item);
+        mSpinner0.setAdapter(spinnerArrayAdapter);
+    }
 
     private void populateSpinner(String[] strings) {
         ArrayAdapter<String> spinnerArrayAdapter
@@ -1112,7 +1196,8 @@ public class SnippetDetailFragment<T, Result>
         } else if (!setupDidRun) {
             setupDidRun = true;
             mProgressbar.setVisibility(View.VISIBLE);
-            mItem.setUp(AbstractSnippet.sServices, getSetUpCallback());
+            mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+            //mItem.setUp(AbstractSnippet.sServices, getSetUpCallback());
             //mItem2.setUp2(AbstractSnippet.sServices, getSetUpCallback(), getSetUpCallback2());
         }
     }

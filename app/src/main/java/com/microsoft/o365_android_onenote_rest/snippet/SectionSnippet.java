@@ -6,15 +6,20 @@ package com.microsoft.o365_android_onenote_rest.snippet;
 
 import com.google.gson.JsonObject;
 import com.microsoft.o365_android_onenote_rest.SnippetDetailFragment;
+import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
 import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.SectionsService;
 import com.microsoft.onenotevos.Envelope;
 import com.microsoft.onenotevos.Notebook;
 import com.microsoft.onenotevos.Section;
+import com.microsoft.sharepoint.service.SitesService;
+import com.microsoft.sharepointvos.FollowedSites;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedString;
@@ -28,6 +33,7 @@ import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_
 public abstract class SectionSnippet<Result>
         extends AbstractSnippet<SectionsService, Result> {
 
+    public Map<String, com.microsoft.sharepointvos.Result> siteMap = new HashMap<>();
     public Map<String, Notebook> notebookMap = new HashMap<>();
     public Map<String, Section> sectionMap = new HashMap<>();
     public String mSiteCollectionId = null;
@@ -91,7 +97,10 @@ public abstract class SectionSnippet<Result>
 
                     @Override
                     public void setUp(Services services, final retrofit.Callback<String[]> callback) {
-                        fillNotebookSpinner(services.mNotebooksService, callback, notebookMap);
+                        RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
+                        SitesService sitesService = restAdapter.create(SitesService.class);
+                        fillSiteSpinner(sitesService, callback, siteMap);
+                        //fillNotebookSpinner(services.mNotebooksService, callback, notebookMap);
                     }
 
 /*
@@ -244,7 +253,40 @@ public abstract class SectionSnippet<Result>
     @Override
     public abstract void request(SectionsService service, Callback<Result> callback);
 
-    protected void fillNotebookSpinner(
+    protected void fillSiteSpinner(
+            SitesService sitesService,
+            final retrofit.Callback<String[]> callback,
+            final Map<String, com.microsoft.sharepointvos.Result> sitesMap) {
+        System.out.println("*** fillSiteSpinner");
+        sitesService.getFollowedSites(
+                new Callback<FollowedSites>() {
+
+                    @Override
+                    public void success(FollowedSites followedSites, Response response) {
+                        System.out.println("*** fillSiteSpinner success");
+                        List<com.microsoft.sharepointvos.Result> resultList = followedSites.getD().getFollowed().getResults();
+                        String[] siteNames = new String[resultList.size()];
+                        for (int i = 0; i < resultList.size(); i++) {
+                            siteNames[i] = resultList.get(i).getName();
+                            sitesMap.put(resultList.get(i).getName(), resultList.get(i));
+                            System.out.println("*** Site: " + siteNames[i]);
+                        }
+                        callback.success(siteNames, response);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** fillSiteSpinner failure");
+                    }
+
+                    @Override
+                    public Map<String, String> getParams() {
+                        return null;
+                    }
+                });
+    }
+
+    public void fillNotebookSpinner(
             NotebooksService notebooksService,
             final retrofit.Callback<String[]> callback,
             final Map<String, Notebook> notebookMap) {
@@ -321,6 +363,7 @@ public abstract class SectionSnippet<Result>
                         for (int i = 0; i < sections.length; i++) {
                             sectionNames[i] = sections[i].name;
                             sectionMap.put(sections[i].name, sections[i]);
+                            System.out.println("*** Section: " + sectionNames[i]);
                         }
                         callback.success(sectionNames, response);
 
@@ -329,6 +372,8 @@ public abstract class SectionSnippet<Result>
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("*** fillSectionSpinner failure");
+                        sectionMap.clear();
+                        //callback.failure(error);
                     }
 
                     @Override
