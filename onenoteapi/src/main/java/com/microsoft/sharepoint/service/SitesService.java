@@ -24,6 +24,6 @@ public interface SitesService {
     @GET("/_api/social.following/my/followed(types=4)")
     //@POST("/_api/sp.userprofiles.profileloader.getprofileloader/getuserprofile/FollowedContent")
     //@POST("/_api/sp.userprofiles.profileloader.getprofileloader/getuserprofile/FollowedSitesUrl")
-    Envelope<FollowedSites> getFollowedSitesSync(
+    FollowedSites getFollowedSitesSync(
     );
 }

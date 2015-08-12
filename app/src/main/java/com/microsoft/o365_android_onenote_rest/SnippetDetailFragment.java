@@ -746,9 +746,16 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** Calling SitesService synchronously");
         RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
         SitesService sitesService = restAdapter.create(SitesService.class);
-        Envelope<FollowedSites> env = sitesService.getFollowedSitesSync();
-        System.out.println("*** Envelope: " + env.toString());
+        FollowedSites followedSites = sitesService.getFollowedSitesSync();
+        //System.out.println("*** Envelope: " + env.toString());
+        for(int j = 0; j < followedSites.getD().getFollowed().getResults().size(); j++)
+            System.out.println("*** Followed site: " + followedSites.getD().getFollowed().getResults().get(j).getName());
+
         //System.out.println("*** Followed site: " + env.value[0].getD().getFollowed().getResults().get(0).getName());
+        //for(int i = 0; i < env.value.length; i++) {
+        //    for(int j = 0; j < env.value[i].getD().getFollowed().getResults().size(); j++)
+        //        System.out.println("*** Followed site: " + env.value[i].getD().getFollowed().getResults().get(j).getName());
+        //}
 
 /*
         ((AzureAppCompatActivity)mActivity).forSharePoint = false;
