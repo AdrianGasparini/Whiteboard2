@@ -4,14 +4,19 @@
 
 package com.microsoft.o365_android_onenote_rest;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.microsoft.AzureADModule;
 import com.microsoft.AzureAppCompatActivity;
 import com.microsoft.live.LiveAuthClient;
 import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
+import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.inject.AzureModule;
 import com.microsoft.o365_android_onenote_rest.inject.ObjectGraphInjector;
 import com.microsoft.o365_android_onenote_rest.model.Scope;
+import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 
 import java.util.ArrayList;
 
@@ -42,11 +47,14 @@ public abstract class BaseActivity
 
     @Override
     protected AzureADModule getAzureADModule() {
-        System.out.println("*** BaseActivity.getAzureADModule: " + mResourceId2);
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
+        System.out.println("*** BaseActivity.getAzureADModule: " + sharePointUrl);
         AzureADModule.Builder builder = new AzureADModule.Builder(this);
         builder.validateAuthority(true)
                 .skipBroker(true)
-                .authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, mResourceId2)   // TODO: change
+                .authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, sharePointUrl)   // TODO: change
                 //.authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, ServiceConstants.AUTHENTICATION_RESOURCE_ID)
                 .authorityUrl(ServiceConstants.AUTHORITY_URL)
                 .redirectUri(ServiceConstants.REDIRECT_URI)

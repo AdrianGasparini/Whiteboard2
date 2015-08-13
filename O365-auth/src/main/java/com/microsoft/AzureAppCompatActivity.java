@@ -39,7 +39,7 @@ public abstract class AzureAppCompatActivity extends AppCompatActivity {
 
     //public boolean forSharePoint = true;
 
-    public static String mResourceId2 = "https://fcpkagXXX.sharepoint.com";; //"https://fcpkag.sharepoint.com";
+    //public static String mResourceId2 = null; //"https://fcpkag.sharepoint.com";
 
     public boolean doIt = true;
 
