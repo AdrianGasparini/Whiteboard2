@@ -4,11 +4,16 @@
 
 package com.microsoft.o365_android_onenote_rest.application;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
+import android.text.InputType;
+import android.widget.EditText;
 
 import com.microsoft.o365_android_onenote_rest.BuildConfig;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.inject.RequestInterceptors;
+import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
 
 import javax.inject.Inject;
 
@@ -54,6 +59,27 @@ public class SnippetApp extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+/*
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("SharePoint URL");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sharePointUrl = input.getText().toString();
+                System.out.println("*** SharePoint URL: " + sharePointUrl);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+*/
     }
 
     public static SnippetApp getApp() {
@@ -78,9 +104,10 @@ public class SnippetApp extends Application {
                 .build();
     }
 
-    public RestAdapter getRestAdapter2() {
+    public RestAdapter getRestAdapter2(String endpoint) {
+        System.out.println("*** SnippetApp.getRestAdapter2: " + endpoint);
         return new RestAdapter.Builder()
-                .setEndpoint("https://fcpkag.sharepoint.com")   // TODO: change
+                .setEndpoint(endpoint)   // TODO: change
                 .setLogLevel(logLevel)
                 .setConverter(converter)
                 .setRequestInterceptor(mRequestInterceptors.requestInterceptor2)

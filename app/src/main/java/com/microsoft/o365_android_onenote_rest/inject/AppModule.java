@@ -85,6 +85,7 @@ public RequestInterceptors providesRequestInterceptor() {
         @Override
         public void intercept(RequestFacade request) {
             // apply the Authorization header if we had a token...
+            System.out.println("*** RequestInterceptor2.intercept");
             final SharedPreferences preferences
                     = SnippetApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             final String token =

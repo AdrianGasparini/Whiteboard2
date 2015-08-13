@@ -3,8 +3,12 @@
 */
 package com.microsoft.o365_android_onenote_rest;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.microsoft.aad.adal.AuthenticationCallback;
@@ -14,6 +18,7 @@ import com.microsoft.live.LiveAuthListener;
 import com.microsoft.live.LiveConnectSession;
 import com.microsoft.live.LiveStatus;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
+import com.microsoft.o365_android_onenote_rest.snippet.SectionSnippet;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.o365_android_onenote_rest.util.User;
 
@@ -32,24 +37,93 @@ public class SignInActivity
         implements AuthenticationCallback<AuthenticationResult>, LiveAuthListener {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
+        System.out.println("*** SignInActivity.onCreate");
+/*
+        SignInActivity.super.onCreate(savedInstanceState);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("SharePoint URL");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sharePointUrl = input.getText().toString();
+                System.out.println("*** SharePoint URL: " + sharePointUrl);
+                BaseActivity.mResourceId2 = "https://fcpkag.sharepoint.com";
+                //SignInActivity.super.onCreate(savedInstanceState);
+                setContentView(R.layout.activity_signin);
+                if (User.isOrg()) {
+                    //mAuthenticationManager.connect(this);
+                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
+                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
+                }
+                ButterKnife.inject(SignInActivity.this);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+*/
+        doIt = false;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
+
         if (User.isOrg()) {
             //mAuthenticationManager.connect(this);
             mAuthenticationManagers.mAuthenticationManager1.connect(this);
             mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
         }
         ButterKnife.inject(this);
+
     }
 
     @OnClick(o365_signin)
     public void onSignInO365Clicked() {
+        System.out.println("*** onSignInO365Clicked");
+/*
         try {
             authenticateOrganization();
         } catch (IllegalArgumentException e) {
             warnBadClient();
         }
+*/
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("SharePoint URL");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sharePointUrl = input.getText().toString();
+                System.out.println("*** SharePoint URL: " + sharePointUrl);
+                if(sharePointUrl.equals("")) sharePointUrl = "https://fcpkag.sharepoint.com";
+                System.out.println("*** SharePoint URL: " + sharePointUrl);
+                BaseActivity.mResourceId2 = sharePointUrl;
+                SectionSnippet.mSharePointEndpoint = sharePointUrl;
+                try {
+                    doIt();
+                    authenticateOrganization();
+                } catch (IllegalArgumentException e) {
+                    warnBadClient();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
     private void warnBadClient() {
@@ -96,9 +170,34 @@ public class SignInActivity
                 }
             });
         } else {
+            System.out.println("*** SignInActivity.authenticateOrganization");
             //mAuthenticationManager.connect(this);
             mAuthenticationManagers.mAuthenticationManager1.connect(this);
             mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
+            /*
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("SharePoint URL");
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String sharePointUrl = input.getText().toString();
+                    System.out.println("*** SharePoint URL: " + sharePointUrl);
+                    BaseActivity.mResourceId2 = "https://fcpkag.sharepoint.com";
+                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
+                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+            */
         }
     }
 

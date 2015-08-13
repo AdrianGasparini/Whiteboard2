@@ -13,6 +13,7 @@ public class SnippetDetailActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("*** SnippetDetailActivity.onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snippet_detail);
         if (null != getSupportActionBar()) {

@@ -3,9 +3,14 @@
 */
 package com.microsoft.o365_android_onenote_rest;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.View;
+import android.widget.EditText;
 
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.util.User;
@@ -18,6 +23,7 @@ public class SnippetListActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("*** SnippetListActivity.onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snippet_list);
 
@@ -43,6 +49,29 @@ public class SnippetListActivity extends BaseActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.snippet_detail_container, fragment)
                 .commit();
+*/
+/*
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("SharePoint URL");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sharePointUrl = input.getText().toString();
+                System.out.println("*** SharePoint URL: " + sharePointUrl);
+                BaseActivity.mResourceId2 = "https://fcpkag.sharepoint.com";
+                onItemSelected(34);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
 */
         onItemSelected(34);
     }

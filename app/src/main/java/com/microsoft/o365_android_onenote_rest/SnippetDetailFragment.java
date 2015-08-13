@@ -764,8 +764,30 @@ public class SnippetDetailFragment<T, Result>
         }
 
         System.out.println("*** onActivityCreated");
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
+/*
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        builder.setTitle("SharePoint URL");
+        final EditText input = new EditText(mActivity);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sharePointUrl = input.getText().toString();
+                System.out.println("*** SharePoint URL: " + sharePointUrl);
+                mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());    // instead of in ready method
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+*/
 /*
         AzureADModule.Builder builder = new AzureADModule.Builder(mActivity);
         builder.validateAuthority(true)
@@ -1196,7 +1218,8 @@ public class SnippetDetailFragment<T, Result>
         } else if (!setupDidRun) {
             setupDidRun = true;
             mProgressbar.setVisibility(View.VISIBLE);
-            mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+            mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());     // TODO: uncomment if immediate setup required
+
             //mItem.setUp(AbstractSnippet.sServices, getSetUpCallback());
             //mItem2.setUp2(AbstractSnippet.sServices, getSetUpCallback(), getSetUpCallback2());
         }
