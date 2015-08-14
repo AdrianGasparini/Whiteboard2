@@ -6,7 +6,9 @@ package com.microsoft.o365_android_onenote_rest.application;
 
 import android.app.AlertDialog;
 import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.text.InputType;
 import android.widget.EditText;
 
@@ -14,6 +16,7 @@ import com.microsoft.o365_android_onenote_rest.BuildConfig;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.inject.RequestInterceptors;
 import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
+import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 
 import javax.inject.Inject;
 
@@ -104,10 +107,13 @@ public class SnippetApp extends Application {
                 .build();
     }
 
-    public RestAdapter getRestAdapter2(String endpoint) {
-        System.out.println("*** SnippetApp.getRestAdapter2: " + endpoint);
+    public RestAdapter getRestAdapter2() {
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
+        System.out.println("*** SnippetApp.getRestAdapter2: " + sharePointUrl);
         return new RestAdapter.Builder()
-                .setEndpoint(endpoint)   // TODO: change
+                .setEndpoint(sharePointUrl)   // TODO: change
                 .setLogLevel(logLevel)
                 .setConverter(converter)
                 .setRequestInterceptor(mRequestInterceptors.requestInterceptor2)

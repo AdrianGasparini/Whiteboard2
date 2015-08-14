@@ -80,6 +80,12 @@
             android:layout_marginTop="3dp"
             android:visibility="gone" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh"
+            android:id="@+id/btn_refresh" />
+
         <EditText
             android:id="@+id/txt_input"
             android:layout_width="match_parent"

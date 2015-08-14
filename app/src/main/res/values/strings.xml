@@ -5,6 +5,7 @@
     <string name="run">Capture image</string>
     <string name="new_section">New section</string>
     <string name="open_onenote">Open OneNote</string>
+    <string name="refresh">Refresh</string>
     <string name="req_url">Request URL</string>
     <string name="req_headers">Request Headers</string>
     <string name="req_body">Request Body</string>

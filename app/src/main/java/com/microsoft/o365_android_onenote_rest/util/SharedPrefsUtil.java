@@ -15,6 +15,7 @@ public class SharedPrefsUtil {
 
     public static final String PREF_AUTH_TOKEN = "PREF_AUTH_TOKEN";
     public static final String PREF_AUTH_TOKEN2 = "PREF_AUTH_TOKEN2";
+    public static final String PREF_SHAREPOINT_URL = "PREF_SHAREPOINT_URL";
 
     public static SharedPreferences getSharedPreferences() {
         return SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);

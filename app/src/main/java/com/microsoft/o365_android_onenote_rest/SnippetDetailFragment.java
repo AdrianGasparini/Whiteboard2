@@ -101,6 +101,7 @@ import static android.R.layout.simple_spinner_item;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_launch_browser;
+import static com.microsoft.o365_android_onenote_rest.R.id.btn_refresh;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_open_onenote;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_new_section;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_run;
@@ -144,6 +145,9 @@ public class SnippetDetailFragment<T, Result>
     String mOneNoteClientUrl = null;
     //String mSiteCollectionId = null;
     //String mSiteId = null;
+    public static String sSiteName = null;
+    public static String sNotebookName = null;
+    public static String sSectionName = null;
 
     @InjectView(txt_status_code)
     protected TextView mStatusCode;
@@ -186,6 +190,9 @@ public class SnippetDetailFragment<T, Result>
 
     @InjectView(btn_open_onenote)
     protected Button mOpenOneNoteButton;
+
+    @InjectView(btn_refresh)
+    protected Button mRefreshButton;
 
     @Inject
     public AuthenticationManagers mAuthenticationManagers;
@@ -603,9 +610,69 @@ public class SnippetDetailFragment<T, Result>
         startActivity(browserIntent);
     }
 
+    @OnClick(btn_refresh)
+    public void onRefreshClicked(Button btn) {
+        System.out.println("*** onRefreshClicked");
+
+        sSiteName = sNotebookName = sSectionName = null;
+        Object selectedSite = mSpinner0.getSelectedItem();
+        if(selectedSite != null) {
+            sSiteName = selectedSite.toString();
+            Object selectedNotebook = mSpinner.getSelectedItem();
+            if(selectedNotebook != null) {
+                sNotebookName = selectedNotebook.toString();
+                Object selectedSection = mSpinner2.getSelectedItem();
+                if(selectedSection != null)
+                    sSectionName = selectedSection.toString();
+            }
+        }
+        System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
+
+        mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+    }
+
     @OnClick(btn_launch_browser)
     public void onLaunchBrowserClicked(Button btn) {
         System.out.println("*** onLaunchBrowserClicked");
+/*
+        final String siteName = mSpinner0.getSelectedItem().toString();
+        final String notebookName = mSpinner.getSelectedItem().toString();
+        final String sectionName = mSpinner2.getSelectedItem().toString();
+*/
+        /*
+        sSiteName = mSpinner0.getSelectedItem().toString();
+        sNotebookName = mSpinner.getSelectedItem().toString();
+        sSectionName = mSpinner2.getSelectedItem().toString();
+        System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
+
+        mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+        */
+/*
+        mSpinner0.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinner0.setSelection(((ArrayAdapter) mSpinner0.getAdapter()).getPosition(siteName), true);
+            }
+        });
+        mSpinner.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinner.setSelection(((ArrayAdapter) mSpinner.getAdapter()).getPosition(notebookName), true);
+            }
+        });
+        mSpinner2.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinner2.setSelection(((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sectionName), true);
+            }
+        });
+*/
+        /*
+        mSpinner0.setSelection(((ArrayAdapter) mSpinner0.getAdapter()).getPosition(siteName), true);
+        mSpinner.setSelection(((ArrayAdapter) mSpinner.getAdapter()).getPosition(notebookName), true);
+        mSpinner2.setSelection(((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sectionName), true);
+        */
+/*
         AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
                 mItem.getVersion(),
                 "https://fcpkag.sharepoint.com/Site2",
@@ -616,7 +683,7 @@ public class SnippetDetailFragment<T, Result>
                     //public void success(Envelope<SiteMetadata> env, Response response) {
                     public void success(SiteMetadata data, Response response) {
                         //mProgressbar.setVisibility(View.GONE);
-                        //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
+                        //if (isAdded() && (null == response)) {
                         System.out.println("*** Received site metadata");
                         //System.out.println("Site Collection ID and Site ID: " + env.value[0].siteCollectionId + " " + env.value[0].siteId);
                         System.out.println("Site Collection ID and Site ID: " + data.siteCollectionId + " " + data.siteId);
@@ -636,6 +703,7 @@ public class SnippetDetailFragment<T, Result>
                     }
                 }
         );
+*/
     }
 
     @OnClick(txt_hyperlink)
@@ -675,7 +743,7 @@ public class SnippetDetailFragment<T, Result>
                     public void success(SiteMetadata siteMetadata, Response response) {
                         System.out.println("*** Received site metadata");
                         System.out.println("*** Site Collection ID and Site ID: " + siteMetadata.siteCollectionId + " " + siteMetadata.siteId);
-                        SectionSnippet item = (SectionSnippet)mItem;
+                        SectionSnippet item = (SectionSnippet) mItem;
                         item.mSiteCollectionId = siteMetadata.siteCollectionId;
                         item.mSiteId = siteMetadata.siteId;
                         item.fillNotebookSpinner(AbstractSnippet.sServices.mNotebooksService, getSetUpCallback(), item.notebookMap);
@@ -904,6 +972,13 @@ public class SnippetDetailFragment<T, Result>
                     //mRunButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner0(strings);
+
+                        if(sSiteName != null) {
+                            int pos = ((ArrayAdapter) mSpinner0.getAdapter()).getPosition(sSiteName);
+                            if(pos != -1) mSpinner0.setSelection(pos, true);
+                            sSiteName = null;
+                        }
+
                     }
                 } else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -931,9 +1006,16 @@ public class SnippetDetailFragment<T, Result>
                 System.out.println("*** Callback1 success");
                 mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
-                    mRunButton.setEnabled(true);
+                    //mRunButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner(strings);
+
+                        if(sNotebookName != null) {
+                            int pos = ((ArrayAdapter) mSpinner.getAdapter()).getPosition(sNotebookName);
+                            if(pos != -1) mSpinner.setSelection(pos, true);
+                            sNotebookName = null;
+                        }
+
                     }
                 } else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -964,6 +1046,13 @@ public class SnippetDetailFragment<T, Result>
                     mRunButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner2(strings);
+
+                        if(sSectionName != null) {
+                            int pos = ((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sSectionName);
+                            if(pos != -1) mSpinner2.setSelection(pos, true);
+                            sSectionName = null;
+                        }
+
                     }
                 }/* else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

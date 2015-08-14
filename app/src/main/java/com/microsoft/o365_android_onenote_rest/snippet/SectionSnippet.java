@@ -33,7 +33,7 @@ import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_
 public abstract class SectionSnippet<Result>
         extends AbstractSnippet<SectionsService, Result> {
 
-    public static String mSharePointEndpoint = null; // "https://fcpkag.sharepoint.com";
+    //public static String mSharePointEndpoint = null; // "https://fcpkag.sharepoint.com";
     public Map<String, com.microsoft.sharepointvos.Result> siteMap = new HashMap<>();
     public Map<String, Notebook> notebookMap = new HashMap<>();
     public Map<String, Section> sectionMap = new HashMap<>();
@@ -98,7 +98,7 @@ public abstract class SectionSnippet<Result>
 
                     @Override
                     public void setUp(Services services, final retrofit.Callback<String[]> callback) {
-                        RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2(mSharePointEndpoint);
+                        RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
                         SitesService sitesService = restAdapter.create(SitesService.class);
                         fillSiteSpinner(sitesService, callback, siteMap);
 
