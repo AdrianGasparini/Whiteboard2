@@ -6,6 +6,9 @@
     <string name="new_section">New section</string>
     <string name="open_onenote">Open OneNote</string>
     <string name="refresh">Refresh</string>
+    <string name="site">Site</string>
+    <string name="notebook">Notebook</string>
+    <string name="section">Section</string>
     <string name="req_url">Request URL</string>
     <string name="req_headers">Request Headers</string>
     <string name="req_body">Request Body</string>
@@ -32,8 +35,8 @@
     <string name="on_update">Permission to create, view, and modify any content in the user’s OneNote notebooks and pages.</string>
     <string name="on_base">Permission to view OneNote notebooks and pages but not to modify them.</string>
     <string name="unavailable">unavailable</string>
-    <string name="err_setup">Error preparing snippet</string>
-    <string name="err_setup_msg">This snippet requires a notebook, section, group, or page before it will run. For example if you are deleting a page, you must first have a page to delete. Check that the appropriate item exists before running this snippet.</string>
+    <string name="err_setup">Error accessing server</string>
+    <string name="err_setup_msg">There was an error connecting to the server. Please check your Internet connection.</string>
     <string name="et_hint">&lt;Your text here&gt;</string>
     <string name="warning_clientid_redirecturi_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the ServiceConstants.java file and run again</string>
 </resources>

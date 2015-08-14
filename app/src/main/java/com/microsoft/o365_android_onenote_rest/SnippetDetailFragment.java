@@ -109,9 +109,9 @@ import static com.microsoft.o365_android_onenote_rest.R.id.progressbar;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner0;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner2;
-import static com.microsoft.o365_android_onenote_rest.R.id.txt_desc;
-import static com.microsoft.o365_android_onenote_rest.R.id.txt_hyperlink;
-import static com.microsoft.o365_android_onenote_rest.R.id.txt_input;
+//import static com.microsoft.o365_android_onenote_rest.R.id.txt_desc;
+//import static com.microsoft.o365_android_onenote_rest.R.id.txt_hyperlink;
+//import static com.microsoft.o365_android_onenote_rest.R.id.txt_input;
 import static com.microsoft.o365_android_onenote_rest.R.id.txt_request_url;
 import static com.microsoft.o365_android_onenote_rest.R.id.txt_response_body;
 import static com.microsoft.o365_android_onenote_rest.R.id.txt_response_headers;
@@ -154,9 +154,10 @@ public class SnippetDetailFragment<T, Result>
 
     @InjectView(txt_status_color)
     protected View mStatusColor;
-
+/*
     @InjectView(txt_desc)
     protected TextView mSnippetDescription;
+*/
 
     @InjectView(txt_request_url)
     protected TextView mRequestUrl;
@@ -175,9 +176,10 @@ public class SnippetDetailFragment<T, Result>
 
     @InjectView(spinner2)
     protected Spinner mSpinner2;
-
+/*
     @InjectView(txt_input)
     protected EditText mEditText;
+*/
 
     @InjectView(progressbar)
     protected ProgressBar mProgressbar;
@@ -213,6 +215,7 @@ public class SnippetDetailFragment<T, Result>
 
     public void setActivity(Activity activity) {
         mActivity = activity;
+        SectionSnippet.sActivity = activity;
     }
 
     @OnClick(txt_request_url)
@@ -420,7 +423,7 @@ public class SnippetDetailFragment<T, Result>
                     new retrofit.Callback<Envelope<Page>>() {
                         @Override
                         public void success(Envelope<Page> env, Response response) {
-                            //mProgressbar.setVisibility(View.GONE);
+                            /**/mProgressbar.setVisibility(View.GONE);
                             //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
                             System.out.println("*** Getting OneNote Client URL");
                             mOneNoteClientUrl = env.links.oneNoteClientUrl.href;
@@ -540,7 +543,7 @@ public class SnippetDetailFragment<T, Result>
                         new retrofit.Callback<Envelope>() {
                             @Override
                             public void success(Envelope env, Response response) {
-                                //mProgressbar.setVisibility(View.GONE);
+                                /**/mProgressbar.setVisibility(View.GONE);
                                 //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
                                 System.out.println("*** postSection success");
                                 mSectionId = env.id;
@@ -613,6 +616,7 @@ public class SnippetDetailFragment<T, Result>
     @OnClick(btn_refresh)
     public void onRefreshClicked(Button btn) {
         System.out.println("*** onRefreshClicked");
+        mProgressbar.setVisibility(View.VISIBLE);
 
         sSiteName = sNotebookName = sSectionName = null;
         Object selectedSite = mSpinner0.getSelectedItem();
@@ -628,6 +632,9 @@ public class SnippetDetailFragment<T, Result>
         }
         System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
 
+        mSpinner0.setVisibility(View.INVISIBLE);
+        mSpinner.setVisibility(View.INVISIBLE);
+        mSpinner2.setVisibility(View.INVISIBLE);
         mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
     }
 
@@ -705,12 +712,12 @@ public class SnippetDetailFragment<T, Result>
         );
 */
     }
-
+/*
     @OnClick(txt_hyperlink)
     public void onDocsLinkClicked(TextView textView) {
         launchUri(Uri.parse(mItem.getUrl()));
     }
-
+*/
     @OnItemSelected(spinner0)
     public void onSpinner0ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
@@ -807,16 +814,16 @@ public class SnippetDetailFragment<T, Result>
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_snippet_detail, container, false);
         ButterKnife.inject(this, rootView);
-        mSnippetDescription.setText(mItem.getDescription());
+        //mSnippetDescription.setText(mItem.getDescription());
         if (Input.Spinner == mItem.mInputArgs) {
-            mSpinner0.setVisibility(VISIBLE);
-            mSpinner.setVisibility(VISIBLE);
-            mSpinner2.setVisibility(VISIBLE);
+            //mSpinner0.setVisibility(VISIBLE);
+            //mSpinner.setVisibility(VISIBLE);
+            //mSpinner2.setVisibility(VISIBLE);
         } else if (Input.Text == mItem.mInputArgs) {
-            mEditText.setVisibility(VISIBLE);
+            //mEditText.setVisibility(VISIBLE);
         } else if (Input.Both == mItem.mInputArgs) {
             mSpinner.setVisibility(VISIBLE);
-            mEditText.setVisibility(VISIBLE);
+            //mEditText.setVisibility(VISIBLE);
         }
         return rootView;
     }
@@ -970,15 +977,15 @@ public class SnippetDetailFragment<T, Result>
                 mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     //mRunButton.setEnabled(true);
+                    mNewSectionButton.setEnabled(false);
                     if (strings.length > 0) {
                         populateSpinner0(strings);
-
+                        mSpinner0.setVisibility(VISIBLE);
                         if(sSiteName != null) {
                             int pos = ((ArrayAdapter) mSpinner0.getAdapter()).getPosition(sSiteName);
                             if(pos != -1) mSpinner0.setSelection(pos, true);
                             sSiteName = null;
                         }
-
                     }
                 } else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -1007,15 +1014,15 @@ public class SnippetDetailFragment<T, Result>
                 mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     //mRunButton.setEnabled(true);
+                    mNewSectionButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner(strings);
-
+                        mSpinner.setVisibility(VISIBLE);
                         if(sNotebookName != null) {
                             int pos = ((ArrayAdapter) mSpinner.getAdapter()).getPosition(sNotebookName);
                             if(pos != -1) mSpinner.setSelection(pos, true);
                             sNotebookName = null;
                         }
-
                     }
                 } else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -1046,13 +1053,12 @@ public class SnippetDetailFragment<T, Result>
                     mRunButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner2(strings);
-
+                        mSpinner2.setVisibility(VISIBLE);
                         if(sSectionName != null) {
                             int pos = ((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sSectionName);
                             if(pos != -1) mSpinner2.setSelection(pos, true);
                             sSectionName = null;
                         }
-
                     }
                 }/* else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -1247,6 +1253,11 @@ public class SnippetDetailFragment<T, Result>
         t.printStackTrace(pw);
         String trace = sw.toString();
         mResponseBody.setText(trace);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.err_setup)
+                .setMessage(R.string.err_setup_msg)
+                .setPositiveButton(R.string.dismiss, null)
+                .show();
     }
 
     private int getColor(Response response) {
@@ -1285,10 +1296,10 @@ public class SnippetDetailFragment<T, Result>
             args.put(ARG_SPINNER_SELECTION, mSpinner.getSelectedItem().toString());
             //args.put(ARG_SPINNER2_SELECTION, mSpinner2.getSelectedItem().toString());
         } else if (Input.Text == mItem.mInputArgs) {
-            args.put(ARG_TEXT_INPUT, mEditText.getText().toString());
+            //args.put(ARG_TEXT_INPUT, mEditText.getText().toString());
         } else if (Input.Both == mItem.mInputArgs) {
             args.put(ARG_SPINNER_SELECTION, mSpinner.getSelectedItem().toString());
-            args.put(ARG_TEXT_INPUT, mEditText.getText().toString());
+            //args.put(ARG_TEXT_INPUT, mEditText.getText().toString());
         } else {
             throw new IllegalStateException("No input modifier to match type");
         }
@@ -1307,6 +1318,9 @@ public class SnippetDetailFragment<T, Result>
         } else if (!setupDidRun) {
             setupDidRun = true;
             mProgressbar.setVisibility(View.VISIBLE);
+            mSpinner0.setVisibility(View.INVISIBLE);
+            mSpinner.setVisibility(View.INVISIBLE);
+            mSpinner2.setVisibility(View.INVISIBLE);
             mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());     // TODO: uncomment if immediate setup required
 
             //mItem.setUp(AbstractSnippet.sServices, getSetUpCallback());

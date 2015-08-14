@@ -4,7 +4,11 @@
 
 package com.microsoft.o365_android_onenote_rest.snippet;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+
 import com.google.gson.JsonObject;
+import com.microsoft.o365_android_onenote_rest.R;
 import com.microsoft.o365_android_onenote_rest.SnippetDetailFragment;
 import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
 import com.microsoft.onenoteapi.service.NotebooksService;
@@ -39,6 +43,7 @@ public abstract class SectionSnippet<Result>
     public Map<String, Section> sectionMap = new HashMap<>();
     public String mSiteCollectionId = null;
     public String mSiteId = null;
+    public static Activity sActivity = null;
 
     public SectionSnippet(Integer descriptionArray) {
         super(SnippetCategory.sectionsSnippetCategory, descriptionArray);
@@ -279,6 +284,14 @@ public abstract class SectionSnippet<Result>
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("*** fillSiteSpinner failure");
+                        /*
+                        AlertDialog.Builder builder = new AlertDialog.Builder(sActivity);
+                        builder.setTitle(R.string.err_setup)
+                                .setMessage(R.string.err_setup_msg)
+                                .setPositiveButton(R.string.dismiss, null)
+                                .show();
+                        */
+                        callback.failure(error);
                     }
 
                     @Override
@@ -318,7 +331,15 @@ public abstract class SectionSnippet<Result>
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        System.out.println("*** fillNotebookSpinner failure");
+                        /*
+                        AlertDialog.Builder builder = new AlertDialog.Builder(sActivity);
+                        builder.setTitle(R.string.err_setup)
+                                .setMessage(R.string.err_setup_msg)
+                                .setPositiveButton(R.string.dismiss, null)
+                                .show();
+                        */
+                        callback.failure(error);
                     }
 
                     @Override
@@ -368,14 +389,20 @@ public abstract class SectionSnippet<Result>
                             System.out.println("*** Section: " + sectionNames[i]);
                         }
                         callback.success(sectionNames, response);
-
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("*** fillSectionSpinner failure");
                         sectionMap.clear();
-                        //callback.failure(error);
+                        /*
+                        AlertDialog.Builder builder = new AlertDialog.Builder(sActivity);
+                        builder.setTitle(R.string.err_setup)
+                                .setMessage(R.string.err_setup_msg)
+                                .setPositiveButton(R.string.dismiss, null)
+                                .show();
+                        */
+                        callback.failure(error);
                     }
 
                     @Override
