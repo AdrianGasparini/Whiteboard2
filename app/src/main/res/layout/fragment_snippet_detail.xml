@@ -112,6 +112,18 @@
             android:text="@string/refresh"
             android:id="@+id/btn_refresh" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/txt_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:freezesText="true"
+            android:text="Everything below is for debugging purposes only." />
+
         <!--TextView
             android:id="@+id/txt_desc"
             android:layout_width="match_parent"

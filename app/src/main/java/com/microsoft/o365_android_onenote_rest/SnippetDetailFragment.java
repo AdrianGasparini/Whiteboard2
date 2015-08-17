@@ -11,6 +11,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ import com.microsoft.live.LiveConnectSession;
 import com.microsoft.live.LiveStatus;
 import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
+import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
 import com.microsoft.o365_android_onenote_rest.snippet.Callback;
 import com.microsoft.o365_android_onenote_rest.snippet.Input;
@@ -552,6 +554,7 @@ public class SnippetDetailFragment<T, Result>
                                 System.out.println("*** Fetching sections");
                                 SectionSnippet item = (SectionSnippet) mItem;
                                 item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
+                                //item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback2(), item.sectionMap, mNotebookId);
                                 mSpinner2.setVisibility(VISIBLE);
 /*
                                 //mSpinner2.setSelection(((ArrayAdapter)mSpinner2.getAdapter()).getPosition(sectionName), true);
@@ -727,6 +730,13 @@ public class SnippetDetailFragment<T, Result>
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
 
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        //preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString()).commit();
+        preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString())
+            .putString(SharedPrefsUtil.PREF_NOTEBOOK, null)
+            .putString(SharedPrefsUtil.PREF_SECTION, null).apply();
+
         SectionSnippet item = (SectionSnippet)mItem;
         //com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(this
         //        .getParams()
@@ -774,6 +784,12 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
         mSpinner2.setVisibility(View.INVISIBLE);
 
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        //preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString()).commit();
+        preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString())
+            .putString(SharedPrefsUtil.PREF_SECTION, null).apply();
+
         SectionSnippet item = (SectionSnippet)mItem;
         //Notebook notebook = (Notebook) item.notebookMap.get(this
         //        .getParams()
@@ -788,7 +804,13 @@ public class SnippetDetailFragment<T, Result>
     // TODO: remove if section id should not be read on spinner selection
     @OnItemSelected(spinner2)
     public void onSpinner2ItemSelected(Spinner theSpinner) {
-        System.out.println("*** Section: " + mSpinner2.getSelectedItem().toString());
+        System.out.println("*** Spinner2 selected: " + mSpinner2.getSelectedItem().toString());
+
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        //preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
+        preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).apply();
+
         SectionSnippet item = (SectionSnippet)mItem;
         Section section = (Section) item.sectionMap.get(mSpinner2.getSelectedItem().toString());
         System.out.println("*** Section id: " + section.id);
@@ -807,6 +829,7 @@ public class SnippetDetailFragment<T, Result>
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        System.out.println("*** onCreate");
         super.onCreate(savedInstanceState);
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItem = (AbstractSnippet<T, Result>)
@@ -837,6 +860,7 @@ public class SnippetDetailFragment<T, Result>
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        System.out.println("*** onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         if (null != getActivity() && getActivity() instanceof AppCompatActivity) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -955,7 +979,18 @@ public class SnippetDetailFragment<T, Result>
 
     @Override
     public void onResume() {
+        System.out.println("*** onResume");
         super.onResume();
+
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
+        sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
+        sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
+        System.out.println("*** Site: " + sSiteName);
+        System.out.println("*** Notebook: " + sNotebookName);
+        System.out.println("*** Section: " + sSectionName);
+
         if (User.isOrg()) {
             //mAuthenticationManager.connect(this);
             mAuthenticationManagers.mAuthenticationManager1.connect(this);
@@ -988,6 +1023,11 @@ public class SnippetDetailFragment<T, Result>
                     if (strings.length > 0) {
                         populateSpinner0(strings);
                         mSpinner0.setVisibility(VISIBLE);
+                        /*
+                        SharedPreferences preferences
+                                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                        String sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
+                        */
                         if(sSiteName != null) {
                             int pos = ((ArrayAdapter) mSpinner0.getAdapter()).getPosition(sSiteName);
                             if(pos != -1) mSpinner0.setSelection(pos, true);
@@ -1026,6 +1066,11 @@ public class SnippetDetailFragment<T, Result>
                     if (strings.length > 0) {
                         populateSpinner(strings);
                         mSpinner.setVisibility(VISIBLE);
+                        /*
+                        SharedPreferences preferences
+                                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                        String sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
+                        */
                         if(sNotebookName != null) {
                             int pos = ((ArrayAdapter) mSpinner.getAdapter()).getPosition(sNotebookName);
                             if(pos != -1) mSpinner.setSelection(pos, true);
@@ -1063,6 +1108,11 @@ public class SnippetDetailFragment<T, Result>
                     if (strings.length > 0) {
                         populateSpinner2(strings);
                         mSpinner2.setVisibility(VISIBLE);
+                        /*
+                        SharedPreferences preferences
+                                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                        String sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
+                        */
                         if(sSectionName != null) {
                             int pos = ((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sSectionName);
                             if(pos != -1) mSpinner2.setSelection(pos, true);
