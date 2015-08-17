@@ -434,7 +434,8 @@ public class SnippetDetailFragment<T, Result>
                         @Override
                         public void failure(RetrofitError error) {
                             if (isAdded()) {
-                                displayThrowable(error.getCause());
+                                //displayThrowable(error.getCause());
+                                displayThrowable(error);
                                 mProgressbar.setVisibility(View.GONE);
                             }
                         }
@@ -551,6 +552,7 @@ public class SnippetDetailFragment<T, Result>
                                 System.out.println("*** Fetching sections");
                                 SectionSnippet item = (SectionSnippet) mItem;
                                 item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
+                                mSpinner2.setVisibility(VISIBLE);
 /*
                                 //mSpinner2.setSelection(((ArrayAdapter)mSpinner2.getAdapter()).getPosition(sectionName), true);
                                 mSpinner2.post(new Runnable() {
@@ -567,7 +569,8 @@ public class SnippetDetailFragment<T, Result>
                             public void failure(RetrofitError error) {
                                 System.out.println("*** postSection failure");
                                 if (isAdded()) {
-                                    displayThrowable(error.getCause());
+                                    //displayThrowable(error.getCause());
+                                    displayThrowable(error);
                                     mProgressbar.setVisibility(View.GONE);
                                 }
                             }
@@ -721,6 +724,8 @@ public class SnippetDetailFragment<T, Result>
     @OnItemSelected(spinner0)
     public void onSpinner0ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
+        mSpinner.setVisibility(View.INVISIBLE);
+        mSpinner2.setVisibility(View.INVISIBLE);
 
         SectionSnippet item = (SectionSnippet)mItem;
         //com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(this
@@ -767,6 +772,8 @@ public class SnippetDetailFragment<T, Result>
     @OnItemSelected(spinner)
     public void onSpinnerItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
+        mSpinner2.setVisibility(View.INVISIBLE);
+
         SectionSnippet item = (SectionSnippet)mItem;
         //Notebook notebook = (Notebook) item.notebookMap.get(this
         //        .getParams()
@@ -999,7 +1006,8 @@ public class SnippetDetailFragment<T, Result>
             @Override
             public void failure(RetrofitError error) {
                 if (isAdded()) {
-                    displayThrowable(error.getCause());
+                    //displayThrowable(error.getCause());
+                    displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
                 }
             }
@@ -1036,7 +1044,8 @@ public class SnippetDetailFragment<T, Result>
             @Override
             public void failure(RetrofitError error) {
                 if (isAdded()) {
-                    displayThrowable(error.getCause());
+                    //displayThrowable(error.getCause());
+                    displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
                 }
             }
@@ -1072,7 +1081,8 @@ public class SnippetDetailFragment<T, Result>
             @Override
             public void failure(RetrofitError error) {
                 if (isAdded()) {
-                    displayThrowable(error.getCause());
+                    //displayThrowable(error.getCause());
+                    displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
                 }
             }
@@ -1111,7 +1121,8 @@ public class SnippetDetailFragment<T, Result>
             public void failure(RetrofitError error) {
                 System.out.println("*** Callback3 failure");
                 if (isAdded()) {
-                    displayThrowable(error.getCause());
+                    //displayThrowable(error.getCause());
+                    displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
                 }
             }
@@ -1253,9 +1264,12 @@ public class SnippetDetailFragment<T, Result>
         t.printStackTrace(pw);
         String trace = sw.toString();
         mResponseBody.setText(trace);
+        //Throwable cause = t.getCause();
+        //String causeMsg = (cause == null) ? "" : (": " + cause.getMessage());
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.err_setup)
-                .setMessage(R.string.err_setup_msg)
+                //.setMessage(R.string.err_setup_msg)
+                .setMessage(t.getMessage())
                 .setPositiveButton(R.string.dismiss, null)
                 .show();
     }

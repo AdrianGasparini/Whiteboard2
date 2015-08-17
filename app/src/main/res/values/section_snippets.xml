@@ -4,7 +4,7 @@
     <string name="section_sections">/sections</string>
 
     <string-array name="sections_specific_notebook">
-        <item>GET: Get list of all sections under a specific notebook</item>
+        <item>Whiteboard</item>
         <item>First we get a list of all notebooks and then query for a list of all sections under one of the selected notebooks. Please select a specific notebook from the drop-down below</item>
         <item>http://dev.onenote.com/docs#/reference/get-sections</item>
         <item>beta</item>
