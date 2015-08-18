@@ -278,6 +278,8 @@ public class SnippetDetailFragment<T, Result>
     @OnClick(btn_run)
     public void onRunClicked(Button btn) {
         System.out.println("*** onRunClicked");
+        mProgressbar.setVisibility(View.VISIBLE);
+        mRunButton.setEnabled(false);
         mOpenOneNoteButton.setEnabled(false);
 
         System.out.println("*** Notebook id: " + mNotebookId);
@@ -429,6 +431,7 @@ public class SnippetDetailFragment<T, Result>
                             //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
                             System.out.println("*** Getting OneNote Client URL");
                             mOneNoteClientUrl = env.links.oneNoteClientUrl.href;
+                            mRunButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
                             //}
                         }
@@ -438,6 +441,7 @@ public class SnippetDetailFragment<T, Result>
                             if (isAdded()) {
                                 //displayThrowable(error.getCause());
                                 displayThrowable(error);
+                                mRunButton.setEnabled(true);
                                 mProgressbar.setVisibility(View.GONE);
                             }
                         }
@@ -445,6 +449,8 @@ public class SnippetDetailFragment<T, Result>
             );
         } else if (requestCode == REQUEST_TAKE_PHOTO && resultCode != Activity.RESULT_OK) {
             System.out.println("*** Photo cancelled");
+            mProgressbar.setVisibility(View.GONE);
+            mRunButton.setEnabled(true);
             mOpenOneNoteButton.setEnabled(mOneNoteClientUrl != null);
         }
     }
