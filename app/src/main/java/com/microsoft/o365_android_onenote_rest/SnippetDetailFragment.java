@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -435,6 +436,52 @@ public class SnippetDetailFragment<T, Result>
                             mOpenOneNoteButton.setEnabled(true);
                             Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
                             toast.show();
+/*
+                            // ------------
+                            DateTime date = DateTime.now();
+                            String imagePartName = "image1";
+                            String simpleHtml = getSimplePageContentBody(SnippetApp
+                                            .getApp()
+                                            .getResources()
+                                            .openRawResource(R.raw.create_page_with_image),
+                                    date.toString(),
+                                    imagePartName);
+
+                            TypedString presentationString = new TypedString(simpleHtml) {
+                                @Override
+                                public String mimeType() {
+                                    return "text/html";
+                                }
+                            };
+                            OneNotePartsMap oneNotePartsMap = new OneNotePartsMap(presentationString);
+
+                            TypedFile typedFile = new TypedFile("image/jpg", mPhotoFile);
+                            oneNotePartsMap.put(imagePartName, typedFile);
+
+                            System.out.println("*** Invoking patchMultiPartPageSP");
+                            String pageId = env.id;
+                            SectionSnippet item = (SectionSnippet)mItem;
+                            AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
+                                    "",
+                                    mItem.getVersion(),
+                                    item.mSiteCollectionId,
+                                    item.mSiteId,
+                                    pageId,
+                                    oneNotePartsMap,
+                                    new retrofit.Callback<Envelope<Page>>() {
+                                        @Override
+                                        public void success(Envelope<Page> env, Response response) {
+                                            System.out.println("*** patchMultiPartPage success");
+                                        }
+
+                                        @Override
+                                        public void failure(RetrofitError error) {
+                                            System.out.println("*** patchMultiPartPage failure: " + error);
+                                        }
+                                    }
+                            );
+                            // ------------
+*/
                             //}
                         }
 
@@ -528,15 +575,12 @@ public class SnippetDetailFragment<T, Result>
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setTitle(R.string.section_name);
 
-// Set up the input
         final EditText input = new EditText(mActivity);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT/* | InputType.TYPE_TEXT_VARIATION_PASSWORD*/);
-        input.setText(R.string.meeting_on + new SimpleDateFormat(" yyyy-MM-dd HH:mm").format(new Date()));
+        input.setText(getResources().getString(R.string.meeting_on) + new SimpleDateFormat(" yyyy-MM-dd HH.mm").format(new Date()));
         input.selectAll();
         builder.setView(input);
 
-// Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

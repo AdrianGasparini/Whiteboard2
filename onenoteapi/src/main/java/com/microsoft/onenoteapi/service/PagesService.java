@@ -200,6 +200,18 @@ public interface PagesService {
             @Body TypedString body,
             Callback<Envelope<Page>> callback
     );
+
+    @Multipart
+    @PATCH("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/pages/{pageId}/content")
+    void patchMultiPartPageSP(
+            @Header("Accept-Encoding") String encoding,
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
+            @Path("pageId") String pageId,
+            @PartMap OneNotePartsMap partMap,
+            Callback<Envelope<Page>> callback
+    );
 }
 // *********************************************************
 //
