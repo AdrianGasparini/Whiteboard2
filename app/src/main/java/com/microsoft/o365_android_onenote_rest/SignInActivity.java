@@ -33,7 +33,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-import static com.microsoft.o365_android_onenote_rest.R.id.msa_signin;
+//import static com.microsoft.o365_android_onenote_rest.R.id.msa_signin;
 import static com.microsoft.o365_android_onenote_rest.R.id.o365_signin;
 
 public class SignInActivity
@@ -103,10 +103,17 @@ public class SignInActivity
             warnBadClient();
         }
 */
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
+        if(sharePointUrl == null) sharePointUrl = ServiceConstants.AUTHENTICATION_RESOURCE_ID2;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("SharePoint URL");
+        builder.setTitle(R.string.sharepoint_url);
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(sharePointUrl);
+        input.selectAll();
         builder.setView(input);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -221,6 +228,7 @@ public class SignInActivity
         URI.create(ServiceConstants.REDIRECT_URI);
     }
 
+    /*
     @OnClick(msa_signin)
     public void onSignInMsaClicked() {
         authenticateMsa();
@@ -240,6 +248,7 @@ public class SignInActivity
             throw new IllegalArgumentException();
         }
     }
+    */
 
     @Override
     public void onSuccess(AuthenticationResult authenticationResult) {

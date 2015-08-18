@@ -4,11 +4,15 @@
     <string name="beta">BETA</string>
     <string name="run">Capture image</string>
     <string name="new_section">New section</string>
-    <string name="open_onenote">Open OneNote</string>
+    <string name="open_onenote">Open in OneNote</string>
     <string name="refresh">Refresh</string>
     <string name="site">Site</string>
     <string name="notebook">Notebook</string>
     <string name="section">Section</string>
+    <string name="sharepoint_url">SharePoint URL</string>
+    <string name="section_name">Section Name</string>
+    <string name="meeting_on">Meeting on</string>
+    <string name="photo_saved">Photo saved in notebook.</string>
     <string name="req_url">Request URL</string>
     <string name="req_headers">Request Headers</string>
     <string name="req_body">Request Body</string>

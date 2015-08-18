@@ -433,6 +433,8 @@ public class SnippetDetailFragment<T, Result>
                             mOneNoteClientUrl = env.links.oneNoteClientUrl.href;
                             mRunButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
+                            Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
+                            toast.show();
                             //}
                         }
 
@@ -524,12 +526,14 @@ public class SnippetDetailFragment<T, Result>
     @OnClick(btn_new_section)
     public void onNewSectionClicked(Button btn) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle("Section Name");
+        builder.setTitle(R.string.section_name);
 
 // Set up the input
         final EditText input = new EditText(mActivity);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT/* | InputType.TYPE_TEXT_VARIATION_PASSWORD*/);
+        input.setText(R.string.meeting_on + new SimpleDateFormat(" yyyy-MM-dd HH:mm").format(new Date()));
+        input.selectAll();
         builder.setView(input);
 
 // Set up the buttons
