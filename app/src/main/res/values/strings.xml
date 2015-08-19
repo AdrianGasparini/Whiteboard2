@@ -41,6 +41,8 @@
     <string name="unavailable">unavailable</string>
     <string name="err_setup">Error accessing server</string>
     <string name="err_setup_msg">There was an error connecting to the server. Please check your Internet connection.</string>
+    <string name="section_without_page_msg">Section without page. Please select a section with a page or create a new section.</string>
+    <string name="section_created_msg">Section created.</string>
     <string name="et_hint">&lt;Your text here&gt;</string>
     <string name="warning_clientid_redirecturi_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the ServiceConstants.java file and run again</string>
 </resources>

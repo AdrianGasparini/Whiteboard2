@@ -34,6 +34,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.microsoft.AuthenticationManager;
 import com.microsoft.AuthenticationManagers;
@@ -57,6 +58,7 @@ import com.microsoft.o365_android_onenote_rest.snippet.SnippetContent;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.o365_android_onenote_rest.util.User;
 import com.microsoft.onenoteapi.service.OneNotePartsMap;
+import com.microsoft.onenoteapi.service.PatchCommand;
 import com.microsoft.onenoteapi.service.SiteMetadataService;
 import com.microsoft.onenotevos.BaseVO;
 import com.microsoft.onenotevos.Envelope;
@@ -140,6 +142,7 @@ public class SnippetDetailFragment<T, Result>
     static final int REQUEST_TAKE_PHOTO = 1;
     String mNotebookId = null;
     String mSectionId = null;
+    String mPageId = null;
     String mCurrentPhotoPath = null;
     File mPhotoFile = null;
     Activity mActivity;
@@ -281,7 +284,7 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** onRunClicked");
         mProgressbar.setVisibility(View.VISIBLE);
         mRunButton.setEnabled(false);
-        mOpenOneNoteButton.setEnabled(false);
+        //mOpenOneNoteButton.setEnabled(false);
 
         System.out.println("*** Notebook id: " + mNotebookId);
         // TODO: uncomment if section id should not be read on spinner selection
@@ -400,6 +403,66 @@ public class SnippetDetailFragment<T, Result>
             String simpleHtml = getSimplePageContentBody(SnippetApp
                             .getApp()
                             .getResources()
+                            .openRawResource(R.raw.patch_page_with_image),
+                    date.toString(),
+                    imagePartName);
+
+            PatchCommand command = new PatchCommand();
+            command.mAction = "append";
+            command.mTarget = "body";
+            command.mPosition = "after";
+            command.mContent = simpleHtml;//"<p>New trailing content</p>";
+            JsonArray jsonArray = new JsonArray();
+            jsonArray.add(command.serialize(command, null, null));
+            Timber.d(jsonArray.toString());
+            TypedString typedString = new TypedString(jsonArray.toString()) {
+                @Override
+                public String mimeType() {
+                    return "application/json";
+                }
+            };
+
+            System.out.println("*** actionString: " + typedString);
+            OneNotePartsMap oneNotePartsMap = new OneNotePartsMap("commands", typedString);
+
+            TypedFile typedFile = new TypedFile("image/jpg", mPhotoFile);
+            oneNotePartsMap.put(imagePartName, typedFile);
+
+            System.out.println("*** Invoking patchMultiPartPageSP");
+            //String pageId = env.id;
+            System.out.println("*** pageId: " + mPageId);
+            SectionSnippet item = (SectionSnippet) mItem;
+            AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
+                    "",
+                    mItem.getVersion(),
+                    item.mSiteCollectionId,
+                    item.mSiteId,
+                    mPageId,
+                    oneNotePartsMap,
+                    new retrofit.Callback<Envelope<Page>>() {
+                        @Override
+                        public void success(Envelope<Page> env, Response response) {
+                            System.out.println("*** patchMultiPartPage success");
+                            mProgressbar.setVisibility(View.GONE);
+                            mRunButton.setEnabled(true);
+                            //mOpenOneNoteButton.setEnabled(true);
+                            Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            System.out.println("*** patchMultiPartPage failure: " + error);
+                        }
+                    }
+            );
+
+            /*
+            DateTime date = DateTime.now();
+            String imagePartName = "image1";
+            String simpleHtml = getSimplePageContentBody(SnippetApp
+                            .getApp()
+                            .getResources()
                             .openRawResource(R.raw.create_page_with_image),
                     date.toString(),
                     imagePartName);
@@ -428,60 +491,74 @@ public class SnippetDetailFragment<T, Result>
                     new retrofit.Callback<Envelope<Page>>() {
                         @Override
                         public void success(Envelope<Page> env, Response response) {
-                            /**/mProgressbar.setVisibility(View.GONE);
-                            //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
+                            mProgressbar.setVisibility(View.GONE);
+                            //if (isAdded() && (null == response)) {
                             System.out.println("*** Getting OneNote Client URL");
                             mOneNoteClientUrl = env.links.oneNoteClientUrl.href;
                             mRunButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
                             Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
                             toast.show();
-/*
+
                             // ------------
-                            DateTime date = DateTime.now();
-                            String imagePartName = "image1";
-                            String simpleHtml = getSimplePageContentBody(SnippetApp
-                                            .getApp()
-                                            .getResources()
-                                            .openRawResource(R.raw.create_page_with_image),
-                                    date.toString(),
-                                    imagePartName);
+if(true) {
 
-                            TypedString presentationString = new TypedString(simpleHtml) {
-                                @Override
-                                public String mimeType() {
-                                    return "text/html";
-                                }
-                            };
-                            OneNotePartsMap oneNotePartsMap = new OneNotePartsMap(presentationString);
+    DateTime date = DateTime.now();
+    String imagePartName = "image1";
+    String simpleHtml = getSimplePageContentBody(SnippetApp
+                    .getApp()
+                    .getResources()
+                    .openRawResource(R.raw.create_page_with_image),
+            date.toString(),
+            imagePartName);
 
-                            TypedFile typedFile = new TypedFile("image/jpg", mPhotoFile);
-                            oneNotePartsMap.put(imagePartName, typedFile);
+    PatchCommand command = new PatchCommand();
+    command.mAction = "append";
+    command.mTarget = "body";
+    command.mPosition = "after";
+    command.mContent = simpleHtml;//"<p>New trailing content</p>";
+    JsonArray jsonArray = new JsonArray();
+    jsonArray.add(command.serialize(command, null, null));
+    Timber.d(jsonArray.toString());
+    TypedString typedString = new TypedString(jsonArray.toString()) {
+        @Override
+        public String mimeType() {
+            return "application/json";
+        }
+    };
 
-                            System.out.println("*** Invoking patchMultiPartPageSP");
-                            String pageId = env.id;
-                            SectionSnippet item = (SectionSnippet)mItem;
-                            AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
-                                    "",
-                                    mItem.getVersion(),
-                                    item.mSiteCollectionId,
-                                    item.mSiteId,
-                                    pageId,
-                                    oneNotePartsMap,
-                                    new retrofit.Callback<Envelope<Page>>() {
-                                        @Override
-                                        public void success(Envelope<Page> env, Response response) {
-                                            System.out.println("*** patchMultiPartPage success");
-                                        }
+    System.out.println("*** actionString: " + typedString);
+    OneNotePartsMap oneNotePartsMap = new OneNotePartsMap("commands", typedString);
 
-                                        @Override
-                                        public void failure(RetrofitError error) {
-                                            System.out.println("*** patchMultiPartPage failure: " + error);
-                                        }
-                                    }
-                            );
+    TypedFile typedFile = new TypedFile("image/jpg", mPhotoFile);
+    oneNotePartsMap.put(imagePartName, typedFile);
+
+    System.out.println("*** Invoking patchMultiPartPageSP");
+    String pageId = env.id;
+    System.out.println("*** pageId: " + pageId);
+    SectionSnippet item = (SectionSnippet) mItem;
+    AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
+            "",
+            mItem.getVersion(),
+            item.mSiteCollectionId,
+            item.mSiteId,
+            pageId,
+            oneNotePartsMap,
+            new retrofit.Callback<Envelope<Page>>() {
+                @Override
+                public void success(Envelope<Page> env, Response response) {
+                    System.out.println("*** patchMultiPartPage success");
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    System.out.println("*** patchMultiPartPage failure: " + error);
+                }
+            }
+    );
+}
                             // ------------
-*/
+
                             //}
                         }
 
@@ -496,11 +573,12 @@ public class SnippetDetailFragment<T, Result>
                         }
                     }
             );
+    */
         } else if (requestCode == REQUEST_TAKE_PHOTO && resultCode != Activity.RESULT_OK) {
             System.out.println("*** Photo cancelled");
             mProgressbar.setVisibility(View.GONE);
             mRunButton.setEnabled(true);
-            mOpenOneNoteButton.setEnabled(mOneNoteClientUrl != null);
+            //mOpenOneNoteButton.setEnabled(mOneNoteClientUrl != null);
         }
     }
 
@@ -584,11 +662,15 @@ public class SnippetDetailFragment<T, Result>
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mProgressbar.setVisibility(View.VISIBLE);
+                mRunButton.setEnabled(false);
+                mOpenOneNoteButton.setEnabled(false);
+
                 /*final String*/
                 mSectionName = input.getText().toString();
                 System.out.println("*** New section name: " + mSectionName);
 
-                SectionSnippet item = (SectionSnippet)mItem;
+                SectionSnippet item = (SectionSnippet) mItem;
                 AbstractSnippet.sServices.mSectionsService.postSectionSP(
                         mItem.getVersion(),
                         item.mSiteCollectionId,
@@ -600,16 +682,80 @@ public class SnippetDetailFragment<T, Result>
                         new retrofit.Callback<Envelope>() {
                             @Override
                             public void success(Envelope env, Response response) {
-                                /**/mProgressbar.setVisibility(View.GONE);
-                                //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
                                 System.out.println("*** postSection success");
+                                // /**/mProgressbar.setVisibility(View.GONE);
+                                //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
                                 mSectionId = env.id;
                                 System.out.println("*** Section ID: " + mSectionId);
+/*
                                 System.out.println("*** Fetching sections");
                                 SectionSnippet item = (SectionSnippet) mItem;
                                 item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
+*/
                                 //item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback2(), item.sectionMap, mNotebookId);
-                                mSpinner2.setVisibility(VISIBLE);
+                                //mSpinner2.setVisibility(VISIBLE);
+
+                                // ********************
+                                DateTime date = DateTime.now();
+                                String imagePartName = "image1";
+                                String simpleHtml = getSimplePageContentBody(SnippetApp
+                                                .getApp()
+                                                .getResources()
+                                                .openRawResource(R.raw.simple_page),
+                                        date.toString(),
+                                        imagePartName);
+
+                                TypedString presentationString = new TypedString(simpleHtml) {
+                                    @Override
+                                    public String mimeType() {
+                                        return "text/html";
+                                    }
+                                };
+
+                                SectionSnippet item = (SectionSnippet)mItem;
+                                AbstractSnippet.sServices.mPagesService.postPagesSP(
+                                        "text/html; encoding=utf8",
+                                        mItem.getVersion(),
+                                        item.mSiteCollectionId,
+                                        item.mSiteId,
+                                        mSectionId,
+                                        presentationString,
+                                        //(Callback<Envelope<Page>>)this
+                                        new retrofit.Callback<Page>() {
+                                            @Override
+                                            public void success(Page page, Response response) {
+                                                //mProgressbar.setVisibility(View.GONE);
+                                                mPageId = page.id;
+                                                //if (isAdded() && (null == response /*|| strings.length > 0*/)) {
+                                                System.out.println("*** Getting OneNote Client URL");
+                                                mOneNoteClientUrl = page.links.oneNoteClientUrl.href;
+
+                                                mRunButton.setEnabled(true);
+                                                mOpenOneNoteButton.setEnabled(true);
+
+                                                System.out.println("*** Fetching sections");
+                                                SectionSnippet item = (SectionSnippet) mItem;
+                                                item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
+
+                                                //Toast toast = Toast.makeText(mActivity, R.string.section_created_msg, Toast.LENGTH_SHORT);
+                                                //toast.show();
+
+                                                //}
+                                            }
+
+                                            @Override
+                                            public void failure(RetrofitError error) {
+                                                if (isAdded()) {
+                                                    //displayThrowable(error.getCause());
+                                                    displayThrowable(error);
+                                                    mRunButton.setEnabled(true);
+                                                    mProgressbar.setVisibility(View.GONE);
+                                                }
+                                            }
+                                        }
+                                );
+
+                                // ********************
 /*
                                 //mSpinner2.setSelection(((ArrayAdapter)mSpinner2.getAdapter()).getPosition(sectionName), true);
                                 mSpinner2.post(new Runnable() {
@@ -628,6 +774,8 @@ public class SnippetDetailFragment<T, Result>
                                 if (isAdded()) {
                                     //displayThrowable(error.getCause());
                                     displayThrowable(error);
+                                    mProgressbar.setVisibility(View.GONE);
+                                    mRunButton.setEnabled(true);
                                     mProgressbar.setVisibility(View.GONE);
                                 }
                             }
@@ -783,6 +931,10 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
+        mPageId = null;
+        mNewSectionButton.setEnabled(false);
+        mRunButton.setEnabled(false);
+        mOpenOneNoteButton.setEnabled(false);
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -837,6 +989,10 @@ public class SnippetDetailFragment<T, Result>
     public void onSpinnerItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
         mSpinner2.setVisibility(View.INVISIBLE);
+        mPageId = null;
+        mNewSectionButton.setEnabled(false);
+        mRunButton.setEnabled(false);
+        mOpenOneNoteButton.setEnabled(false);
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -853,12 +1009,17 @@ public class SnippetDetailFragment<T, Result>
         mNotebookId = notebook.id;
 
         item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback2(), item.sectionMap, notebook.id);
+
+        mNewSectionButton.setEnabled(true);
     }
 
     // TODO: remove if section id should not be read on spinner selection
     @OnItemSelected(spinner2)
     public void onSpinner2ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner2 selected: " + mSpinner2.getSelectedItem().toString());
+        mPageId = null;
+        mRunButton.setEnabled(false);
+        mOpenOneNoteButton.setEnabled(false);
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -869,6 +1030,42 @@ public class SnippetDetailFragment<T, Result>
         Section section = (Section) item.sectionMap.get(mSpinner2.getSelectedItem().toString());
         System.out.println("*** Section id: " + section.id);
         mSectionId = section.id;
+
+        //SectionSnippet item = (SectionSnippet)mItem;
+        AbstractSnippet.sServices.mPagesService.getSectionPagesSP(
+                mItem.getVersion(),
+                item.mSiteCollectionId,
+                item.mSiteId,
+                mSectionId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                new retrofit.Callback<Envelope<Page>>() {
+                    @Override
+                    public void success(Envelope<Page> env, Response response) {
+                        if(env.value.length > 0) {
+                            mPageId = env.value[0].id;
+                            mOneNoteClientUrl = env.value[0].links.oneNoteClientUrl.href;
+                            mRunButton.setEnabled(true);
+                            mOpenOneNoteButton.setEnabled(true);
+                        }
+                        else {
+                            //mRunButton.setEnabled(false);
+                            //mOpenOneNoteButton.setEnabled(false);
+                            Toast toast = Toast.makeText(mActivity, R.string.section_without_page_msg, Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        if (isAdded()) {
+                            displayThrowable(error);
+                        }
+                    }
+                });
     }
 
     private void launchUri(Uri uri) {
@@ -1199,7 +1396,7 @@ public class SnippetDetailFragment<T, Result>
             @Override
             public void success(String[] strings, Response response) {
                 System.out.println("*** Callback3 success");
-                mProgressbar.setVisibility(View.GONE);
+                //mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     mRunButton.setEnabled(true);
                     if (strings.length > 0) {
@@ -1211,6 +1408,10 @@ public class SnippetDetailFragment<T, Result>
                                 mSpinner2.setSelection(((ArrayAdapter) mSpinner2.getAdapter()).getPosition(mSectionName), true);
                             }
                         });
+                        mProgressbar.setVisibility(View.GONE);
+                        mSpinner2.setVisibility(VISIBLE);
+                        Toast toast = Toast.makeText(mActivity, R.string.section_created_msg, Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 }/* else if (isAdded() && strings.length <= 0 && null != response) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

@@ -101,6 +101,20 @@ public interface PagesService {
             Callback<Envelope<Page>> callback
     );
 
+    @GET("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/sections/{sectionId}/pages")
+    void getSectionPagesSP(
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
+            @Path("sectionId") String sectionId,
+            @Query("orderby") String order,
+            @Query("select") String select,
+            @Query("top") Integer top,
+            @Query("skip") Integer skip,
+            @Query("search") String search,
+            Callback<Envelope<Page>> callback
+    );
+
     /**
      * Creates a new page in a specified OneNote section
      *
@@ -115,6 +129,17 @@ public interface PagesService {
             @Header("Content-type") String contentTypeHeader,
             @Path("version") String version,
             @Path("id") String id,
+            @Body TypedString content,
+            Callback<Page> callback
+    );
+
+    @POST("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/sections/{sectionId}/pages")
+    void postPagesSP(
+            @Header("Content-type") String contentTypeHeader,
+            @Path("version") String version,
+            @Path("sitecollectionid") String siteCollectionId,
+            @Path("siteid") String siteId,
+            @Path("sectionId") String sectionId,
             @Body TypedString content,
             Callback<Page> callback
     );

@@ -16,6 +16,10 @@ public class OneNotePartsMap extends HashMap<String, TypedInput> {
         put(MANDATORY_PART_NAME, initValue);
     }
 
+    public OneNotePartsMap(String partName, TypedInput initValue) {
+        put(partName, initValue);
+    }
+
 }
 // *********************************************************
 //
