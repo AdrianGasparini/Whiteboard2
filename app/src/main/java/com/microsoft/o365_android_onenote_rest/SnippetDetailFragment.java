@@ -97,6 +97,8 @@ import static android.R.layout.simple_spinner_item;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_launch_browser;
+import static com.microsoft.o365_android_onenote_rest.R.id.btn_set_default;
+import static com.microsoft.o365_android_onenote_rest.R.id.btn_goto_default;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_pick_photos;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_refresh;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_open_onenote;
@@ -147,6 +149,7 @@ public class SnippetDetailFragment<T, Result>
     public static String sSiteName = null;
     public static String sNotebookName = null;
     public static String sSectionName = null;
+    public boolean mGotoDefault = false;
 
     @InjectView(txt_status_code)
     protected TextView mStatusCode;
@@ -197,6 +200,12 @@ public class SnippetDetailFragment<T, Result>
 
     @InjectView(btn_pick_photos)
     protected Button mPickPhotosButton;
+
+    @InjectView(btn_set_default)
+    protected Button mSetDefaultButton;
+
+    @InjectView(btn_goto_default)
+    protected Button mGotoDefaultButton;
 
     @Inject
     public AuthenticationManagers mAuthenticationManagers;
@@ -1042,6 +1051,7 @@ if(true) {
         mSpinner0.setVisibility(View.INVISIBLE);
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
+        mGotoDefault = false;
         mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
     }
 
@@ -1057,6 +1067,40 @@ if(true) {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Pictures"), PICK_IMAGES);
+    }
+
+    @OnClick(btn_set_default)
+    public void onSetDefaultClicked(Button btn) {
+        System.out.println("*** onSetDefaultClicked");
+        //mProgressbar.setVisibility(View.VISIBLE);
+
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        //preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString()).commit();
+        preferences.edit().putString(SharedPrefsUtil.PREF_DEFAULT_SITE, mSpinner0.getSelectedItem().toString())
+                .putString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, mSpinner.getSelectedItem().toString()).apply();
+
+        Toast toast = Toast.makeText(mActivity, R.string.set_default_msg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    @OnClick(btn_goto_default)
+    public void onGotoDefaultClicked(Button btn) {
+        System.out.println("*** onGotoDefaultClicked");
+        mProgressbar.setVisibility(View.VISIBLE);
+
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        sSiteName = preferences.getString(SharedPrefsUtil.PREF_DEFAULT_SITE, null);
+        sNotebookName = preferences.getString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, null);
+        sSectionName = null;
+        System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
+
+        mSpinner0.setVisibility(View.INVISIBLE);
+        mSpinner.setVisibility(View.INVISIBLE);
+        mSpinner2.setVisibility(View.INVISIBLE);
+        mGotoDefault = true;
+        mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
     }
 
     @OnClick(btn_launch_browser)
@@ -1261,14 +1305,13 @@ if(true) {
                 new retrofit.Callback<Envelope<Page>>() {
                     @Override
                     public void success(Envelope<Page> env, Response response) {
-                        if(env.value.length > 0) {
+                        if (env.value.length > 0) {
                             mPageId = env.value[0].id;
                             mOneNoteClientUrl = env.value[0].links.oneNoteClientUrl.href;
                             mRunButton.setEnabled(true);
                             mPickPhotosButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
-                        }
-                        else {
+                        } else {
                             //mRunButton.setEnabled(false);
                             //mOpenOneNoteButton.setEnabled(false);
                             Toast toast = Toast.makeText(mActivity, R.string.section_without_page_msg, Toast.LENGTH_LONG);
@@ -1586,6 +1629,9 @@ if(true) {
                             int pos = ((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sSectionName);
                             if(pos != -1) mSpinner2.setSelection(pos, true);
                             sSectionName = null;
+                        } else if(mGotoDefault) {
+                            onNewSectionClicked(mNewSectionButton);
+                            mGotoDefault = false;
                         }
                     }
                 }/* else if (isAdded() && strings.length <= 0 && null != response) {
@@ -1603,6 +1649,7 @@ if(true) {
                     //displayThrowable(error.getCause());
                     displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
+                    mGotoDefault = false;
                 }
             }
         };

@@ -19,6 +19,8 @@ public class SharedPrefsUtil {
     public static final String PREF_SITE = "PREF_SITE";
     public static final String PREF_NOTEBOOK = "PREF_NOTEBOOK";
     public static final String PREF_SECTION = "PREF_SECTION";
+    public static final String PREF_DEFAULT_SITE = "PREF_DEFAULT_SITE";
+    public static final String PREF_DEFAULT_NOTEBOOK = "PREF_DEFAULT_NOTEBOOK";
 
     public static SharedPreferences getSharedPreferences() {
         return SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);

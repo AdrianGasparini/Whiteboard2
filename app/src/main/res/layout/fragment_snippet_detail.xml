@@ -12,6 +12,27 @@
         android:orientation="vertical"
         android:weightSum="1">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:weightSum="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/set_default"
+                android:id="@+id/btn_set_default" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/goto_default"
+                android:id="@+id/btn_goto_default" />
+
+        </LinearLayout>
+
         <TextView
             style="@style/detail_section"
             android:layout_width="match_parent"
