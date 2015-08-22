@@ -12,58 +12,6 @@
         android:orientation="vertical"
         android:weightSum="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:weightSum="1">
-
-            <!--
-            <TextView
-                android:id="@+id/txt_hyperlink"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:text="@string/docs"
-                android:textColor="#FF0000FF" />
-            -->
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:enabled="false"
-                android:text="@string/new_section"
-                android:id="@+id/btn_new_section" />
-
-            <Button
-                android:id="@+id/btn_run"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:enabled="false"
-                android:text="@string/run" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:enabled="false"
-                android:text="@string/open_onenote"
-                android:id="@+id/btn_open_onenote" />
-
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressbar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:indeterminateOnly="true"
-            android:visibility="gone" />
-
         <TextView
             style="@style/detail_section"
             android:layout_width="match_parent"
@@ -106,11 +54,76 @@
             android:layout_marginTop="3dp"
             android:visibility="gone" />
 
-        <Button
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:weightSum="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/new_section"
+                android:id="@+id/btn_new_section" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/refresh"
+                android:id="@+id/btn_refresh" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:weightSum="1">
+
+            <!--
+            <TextView
+                android:id="@+id/txt_hyperlink"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:text="@string/docs"
+                android:textColor="#FF0000FF" />
+            -->
+
+            <Button
+                android:id="@+id/btn_run"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:enabled="false"
+                android:text="@string/run" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:enabled="false"
+                android:text="@string/pick_photos"
+                android:id="@+id/btn_pick_photos" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:enabled="false"
+                android:text="@string/open_onenote"
+                android:id="@+id/btn_open_onenote" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/refresh"
-            android:id="@+id/btn_refresh" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:indeterminateOnly="true"
+            android:visibility="gone" />
 
         <Space
             android:layout_width="match_parent"

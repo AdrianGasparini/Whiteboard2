@@ -12,12 +12,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -36,10 +34,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.microsoft.AuthenticationManager;
 import com.microsoft.AuthenticationManagers;
-import com.microsoft.AzureADModule;
-import com.microsoft.AzureAppCompatActivity;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.live.LiveAuthClient;
@@ -48,7 +43,6 @@ import com.microsoft.live.LiveAuthListener;
 import com.microsoft.live.LiveConnectSession;
 import com.microsoft.live.LiveStatus;
 import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
-import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
 import com.microsoft.o365_android_onenote_rest.snippet.Callback;
@@ -59,16 +53,12 @@ import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.o365_android_onenote_rest.util.User;
 import com.microsoft.onenoteapi.service.OneNotePartsMap;
 import com.microsoft.onenoteapi.service.PatchCommand;
-import com.microsoft.onenoteapi.service.SiteMetadataService;
 import com.microsoft.onenotevos.BaseVO;
 import com.microsoft.onenotevos.Envelope;
-import com.microsoft.onenotevos.Links;
 import com.microsoft.onenotevos.Notebook;
 import com.microsoft.onenotevos.Page;
 import com.microsoft.onenotevos.Section;
 import com.microsoft.onenotevos.SiteMetadata;
-import com.microsoft.sharepoint.service.SitesService;
-import com.microsoft.sharepointvos.FollowedSites;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -77,11 +67,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +85,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
@@ -106,6 +97,7 @@ import static android.R.layout.simple_spinner_item;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_launch_browser;
+import static com.microsoft.o365_android_onenote_rest.R.id.btn_pick_photos;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_refresh;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_open_onenote;
 import static com.microsoft.o365_android_onenote_rest.R.id.btn_new_section;
@@ -140,6 +132,7 @@ public class SnippetDetailFragment<T, Result>
     public static final String APP_STORE_URI = "https://play.google.com/store/apps/details?id=com.microsoft.office.onenote";
 
     static final int REQUEST_TAKE_PHOTO = 1;
+    static final int PICK_IMAGES = 2;
     String mNotebookId = null;
     String mSectionId = null;
     String mPageId = null;
@@ -201,6 +194,9 @@ public class SnippetDetailFragment<T, Result>
 
     @InjectView(btn_refresh)
     protected Button mRefreshButton;
+
+    @InjectView(btn_pick_photos)
+    protected Button mPickPhotosButton;
 
     @Inject
     public AuthenticationManagers mAuthenticationManagers;
@@ -284,6 +280,7 @@ public class SnippetDetailFragment<T, Result>
         System.out.println("*** onRunClicked");
         mProgressbar.setVisibility(View.VISIBLE);
         mRunButton.setEnabled(false);
+        mPickPhotosButton.setEnabled(false);
         //mOpenOneNoteButton.setEnabled(false);
 
         System.out.println("*** Notebook id: " + mNotebookId);
@@ -445,6 +442,7 @@ public class SnippetDetailFragment<T, Result>
                             System.out.println("*** patchMultiPartPage success");
                             mProgressbar.setVisibility(View.GONE);
                             mRunButton.setEnabled(true);
+                            mPickPhotosButton.setEnabled(true);
                             //mOpenOneNoteButton.setEnabled(true);
                             Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
                             toast.show();
@@ -453,6 +451,10 @@ public class SnippetDetailFragment<T, Result>
                         @Override
                         public void failure(RetrofitError error) {
                             System.out.println("*** patchMultiPartPage failure: " + error);
+                            displayThrowable(error);
+                            mProgressbar.setVisibility(View.GONE);
+                            mRunButton.setEnabled(true);
+                            mPickPhotosButton.setEnabled(true);
                         }
                     }
             );
@@ -578,10 +580,203 @@ if(true) {
             System.out.println("*** Photo cancelled");
             mProgressbar.setVisibility(View.GONE);
             mRunButton.setEnabled(true);
+            mPickPhotosButton.setEnabled(true);
             //mOpenOneNoteButton.setEnabled(mOneNoteClientUrl != null);
+        } else if(requestCode == PICK_IMAGES){
+            if(resultCode == Activity.RESULT_OK){
+                ArrayList<Uri> uriArray = new ArrayList<Uri>();
+                //data.getParcelableArrayExtra(name);
+                //If Single image selected then it will fetch from Gallery
+                if(data.getData() != null){
+                    Uri uri = data.getData();
+                    uriArray.add(uri);
+                    System.out.println("*** Single Uri: " + uri);
+                } else {
+                    if(data.getClipData() != null){
+                        ClipData mClipData=data.getClipData();
+                        //ArrayList<Uri> mArrayUri=new ArrayList<Uri>();
+                        for(int i = 0; i < mClipData.getItemCount(); i++){
+                            ClipData.Item item = mClipData.getItemAt(i);
+                            Uri uri = item.getUri();
+                            uriArray.add(uri);
+                            System.out.println("*** Uri: " + uri);
+                        }
+                        //System.out.println("*** Selected Images: " + uriArray.size());
+                    }
+                }
+                System.out.println("*** Selected Images: " + uriArray.size());
+
+                StringBuffer html = new StringBuffer("<html><body>");
+                for(int i = 0; i < uriArray.size(); i++) {
+                    String imagePartName = "partName" + i;
+                    System.out.println("*** partName: " + imagePartName);
+                    html.append("<br><img src=\"name:").append(imagePartName).append("\" alt=\"An image\"/><br>");
+                }
+                html.append("</body></html>");
+                System.out.println("*** html: " + html);
+
+                PatchCommand command = new PatchCommand();
+                command.mAction = "append";
+                command.mTarget = "body";
+                command.mPosition = "after";
+                command.mContent = html.toString();
+                JsonArray jsonArray = new JsonArray();
+                jsonArray.add(command.serialize(command, null, null));
+                Timber.d(jsonArray.toString());
+                TypedString typedString = new TypedString(jsonArray.toString()) {
+                    @Override
+                    public String mimeType() {
+                        return "application/json";
+                    }
+                };
+                System.out.println("*** actionString: " + typedString);
+                OneNotePartsMap oneNotePartsMap = new OneNotePartsMap("commands", typedString);
+
+                int i = 0;
+                for(final Uri uri : uriArray) {
+                    String imagePartName = "partName" + i;
+                    System.out.println("*** partName: " + imagePartName);
+                    System.out.println("*** Uri:" + uri.getPath());
+                    /*
+                    InputStream is0 = null;
+                    int available0 = 0;
+                    try {
+                        is0 = mActivity.getContentResolver().openInputStream(uri);
+                        available0 = is0.available();
+                        System.out.println("*** available: " + is0.available());
+                    } catch (IOException ex) {
+                        System.out.println("*** Error: " + ex);
+                    }
+                    final InputStream is = is0;
+                    final int available = available0;
+                    */
+                    //String path = getRealPathFromURI(uri);
+                    //System.out.println("*** path:" + path);
+                    //File photoFile = new File(path);
+                    //InputStream is = mActivity.getContentResolver().openInputStream(uri);
+                    //File photoFile = new File();
+                    //TypedFile typedFile = new TypedFile("image/jpg", photoFile);
+                    //oneNotePartsMap.put(imagePartName, typedFile)
+                    InputStream is = null;
+                    File photoFile = null;
+                    try {
+                        is = mActivity.getContentResolver().openInputStream(uri);
+                        photoFile = createImageFile();
+                        FileOutputStream os = new FileOutputStream(photoFile);
+                        int read = 0;
+                        byte[] bytes = new byte[1024];
+                        while ((read = is.read(bytes)) != -1) {
+                            os.write(bytes, 0, read);
+                        }
+                        os.flush();
+                    } catch (IOException ex) {
+                        System.out.println("*** Error: " + ex);
+                    } finally {
+                        try {
+                            if (is != null)
+                                is.close();
+                        } catch (IOException ex) {
+                            System.out.println("*** Error: " + ex);
+                        }
+                    }
+                    TypedFile typedFile = new TypedFile("image/jpg", photoFile);
+                    oneNotePartsMap.put(imagePartName, typedFile);
+                    /*
+                    TypedInput typedInput = new TypedInput() {
+                        @Override
+                        public String mimeType() {
+                            return "image/jpg";
+                        }
+
+                        @Override
+                        public long length() {
+                            return -1;
+                        }
+
+                        @Override
+                        public InputStream in() throws IOException {
+                            return mActivity.getContentResolver().openInputStream(uri);
+                        }
+                    };
+                    oneNotePartsMap.put(imagePartName, typedInput);
+                    */
+                    i++;
+                }
+
+                System.out.println("*** Invoking patchMultiPartPageSP");
+                System.out.println("*** pageId: " + mPageId);
+                SectionSnippet item = (SectionSnippet) mItem;
+                AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
+                        "",
+                        mItem.getVersion(),
+                        item.mSiteCollectionId,
+                        item.mSiteId,
+                        mPageId,
+                        oneNotePartsMap,
+                        new retrofit.Callback<Envelope<Page>>() {
+                            @Override
+                            public void success(Envelope<Page> env, Response response) {
+                                System.out.println("*** patchMultiPartPage success");
+                                mProgressbar.setVisibility(View.GONE);
+                                mRunButton.setEnabled(true);
+                                mPickPhotosButton.setEnabled(true);
+                                //mOpenOneNoteButton.setEnabled(true);
+                                Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                System.out.println("*** patchMultiPartPage failure: " + error);
+                                displayThrowable(error);
+                                mProgressbar.setVisibility(View.GONE);
+                                mRunButton.setEnabled(true);
+                                mPickPhotosButton.setEnabled(true);
+                            }
+                        }
+                );
+            }
         }
     }
 
+    /*
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+    */
+    /*
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(mActivity, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
+    }
+    */
+    /*
+    private String getPath(Uri uri) {
+        String[]  data = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(mActivity, uri, data, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+    */
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -664,6 +859,7 @@ if(true) {
             public void onClick(DialogInterface dialog, int which) {
                 mProgressbar.setVisibility(View.VISIBLE);
                 mRunButton.setEnabled(false);
+                mPickPhotosButton.setEnabled(false);
                 mOpenOneNoteButton.setEnabled(false);
 
                 /*final String*/
@@ -712,7 +908,7 @@ if(true) {
                                     }
                                 };
 
-                                SectionSnippet item = (SectionSnippet)mItem;
+                                SectionSnippet item = (SectionSnippet) mItem;
                                 AbstractSnippet.sServices.mPagesService.postPagesSP(
                                         "text/html; encoding=utf8",
                                         mItem.getVersion(),
@@ -731,6 +927,7 @@ if(true) {
                                                 mOneNoteClientUrl = page.links.oneNoteClientUrl.href;
 
                                                 mRunButton.setEnabled(true);
+                                                mPickPhotosButton.setEnabled(true);
                                                 mOpenOneNoteButton.setEnabled(true);
 
                                                 System.out.println("*** Fetching sections");
@@ -749,6 +946,7 @@ if(true) {
                                                     //displayThrowable(error.getCause());
                                                     displayThrowable(error);
                                                     mRunButton.setEnabled(true);
+                                                    mPickPhotosButton.setEnabled(true);
                                                     mProgressbar.setVisibility(View.GONE);
                                                 }
                                             }
@@ -776,6 +974,7 @@ if(true) {
                                     displayThrowable(error);
                                     mProgressbar.setVisibility(View.GONE);
                                     mRunButton.setEnabled(true);
+                                    mPickPhotosButton.setEnabled(true);
                                     mProgressbar.setVisibility(View.GONE);
                                 }
                             }
@@ -844,6 +1043,20 @@ if(true) {
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+    }
+
+    @OnClick(btn_pick_photos)
+    public void onPickPhotosClicked(Button btn) {
+        System.out.println("*** onPickPhotosClicked");
+        mProgressbar.setVisibility(View.VISIBLE);
+        mRunButton.setEnabled(false);
+        mPickPhotosButton.setEnabled(false);
+
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Pictures"), PICK_IMAGES);
     }
 
     @OnClick(btn_launch_browser)
@@ -934,6 +1147,7 @@ if(true) {
         mPageId = null;
         mNewSectionButton.setEnabled(false);
         mRunButton.setEnabled(false);
+        mPickPhotosButton.setEnabled(false);
         mOpenOneNoteButton.setEnabled(false);
 
         SharedPreferences preferences
@@ -992,6 +1206,7 @@ if(true) {
         mPageId = null;
         mNewSectionButton.setEnabled(false);
         mRunButton.setEnabled(false);
+        mPickPhotosButton.setEnabled(false);
         mOpenOneNoteButton.setEnabled(false);
 
         SharedPreferences preferences
@@ -1019,6 +1234,7 @@ if(true) {
         System.out.println("*** Spinner2 selected: " + mSpinner2.getSelectedItem().toString());
         mPageId = null;
         mRunButton.setEnabled(false);
+        mPickPhotosButton.setEnabled(false);
         mOpenOneNoteButton.setEnabled(false);
 
         SharedPreferences preferences
@@ -1049,6 +1265,7 @@ if(true) {
                             mPageId = env.value[0].id;
                             mOneNoteClientUrl = env.value[0].links.oneNoteClientUrl.href;
                             mRunButton.setEnabled(true);
+                            mPickPhotosButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
                         }
                         else {
@@ -1356,6 +1573,7 @@ if(true) {
                 mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     mRunButton.setEnabled(true);
+                    mPickPhotosButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner2(strings);
                         mSpinner2.setVisibility(VISIBLE);
@@ -1399,6 +1617,7 @@ if(true) {
                 //mProgressbar.setVisibility(View.GONE);
                 if (isAdded() && (null == response || strings.length > 0)) {
                     mRunButton.setEnabled(true);
+                    mPickPhotosButton.setEnabled(true);
                     if (strings.length > 0) {
                         populateSpinner2(strings);
                         //mSpinner2.setSelection(((ArrayAdapter)mSpinner2.getAdapter()).getPosition(sectionName), true);
@@ -1634,6 +1853,7 @@ if(true) {
     private void ready() {
         if (Input.None == mItem.mInputArgs) {
             mRunButton.setEnabled(true);
+            mPickPhotosButton.setEnabled(true);
         } else if (!setupDidRun) {
             setupDidRun = true;
             mProgressbar.setVisibility(View.VISIBLE);
