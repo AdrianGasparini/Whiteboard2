@@ -744,6 +744,10 @@ if(true) {
                             }
                         }
                 );
+            } else {
+                mProgressbar.setVisibility(View.GONE);
+                mRunButton.setEnabled(true);
+                mPickPhotosButton.setEnabled(true);
             }
         }
     }
@@ -1076,9 +1080,10 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        //preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString()).commit();
         preferences.edit().putString(SharedPrefsUtil.PREF_DEFAULT_SITE, mSpinner0.getSelectedItem().toString())
                 .putString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, mSpinner.getSelectedItem().toString()).apply();
+
+        mGotoDefaultButton.setEnabled(true);
 
         Toast toast = Toast.makeText(mActivity, R.string.set_default_msg, Toast.LENGTH_SHORT);
         toast.show();
@@ -1248,7 +1253,7 @@ if(true) {
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
         mSpinner2.setVisibility(View.INVISIBLE);
         mPageId = null;
-        mNewSectionButton.setEnabled(false);
+        //mNewSectionButton.setEnabled(false);
         mRunButton.setEnabled(false);
         mPickPhotosButton.setEnabled(false);
         mOpenOneNoteButton.setEnabled(false);
@@ -1269,6 +1274,7 @@ if(true) {
 
         item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback2(), item.sectionMap, notebook.id);
 
+        mSetDefaultButton.setEnabled(true);
         mNewSectionButton.setEnabled(true);
     }
 
@@ -1908,6 +1914,11 @@ if(true) {
             mSpinner.setVisibility(View.INVISIBLE);
             mSpinner2.setVisibility(View.INVISIBLE);
             mItem.setUp(AbstractSnippet.sServices, getSetUpCallback0());     // TODO: uncomment if immediate setup required
+
+            SharedPreferences preferences
+                    = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+            mGotoDefaultButton.setEnabled(preferences.getString(SharedPrefsUtil.PREF_DEFAULT_SITE, null) != null &&
+                    preferences.getString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, null) != null);
 
             //mItem.setUp(AbstractSnippet.sServices, getSetUpCallback());
             //mItem2.setUp2(AbstractSnippet.sServices, getSetUpCallback(), getSetUpCallback2());
