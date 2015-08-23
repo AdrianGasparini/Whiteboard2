@@ -12,6 +12,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -77,6 +83,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -124,7 +131,7 @@ import static com.microsoft.o365_android_onenote_rest.R.string.response_headers;
 public class SnippetDetailFragment<T, Result>
         extends BaseFragment
         implements Callback<Result>,
-        AuthenticationCallback<AuthenticationResult>, LiveAuthListener {
+        AuthenticationCallback<AuthenticationResult>, LiveAuthListener, LocationListener {
 
     public static final String ARG_ITEM_ID = "item_id";
     public static final String ARG_TEXT_INPUT = "TextInput";
@@ -150,6 +157,9 @@ public class SnippetDetailFragment<T, Result>
     public static String sNotebookName = null;
     public static String sSectionName = null;
     public boolean mGotoDefault = false;
+    LocationManager mLocationManager = null;
+    String mLocationProvider = null;
+    String mFinalAddress = null;
 
     @InjectView(txt_status_code)
     protected TextView mStatusCode;
@@ -858,12 +868,48 @@ if(true) {
 
     @OnClick(btn_new_section)
     public void onNewSectionClicked(Button btn) {
+        //String finalAddress = null;
+        /*
+        LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String provider = locationManager.getBestProvider(criteria, false);
+        */
+        //Location location = mLocationManager.getLastKnownLocation(mLocationProvider);
+        /*
+        if (mLocation != null) {
+            System.out.println("*** Provider " + mLocationProvider + " has been selected.");
+            double lat = mLocation.getLatitude();
+            double lng = mLocation.getLongitude();
+            Geocoder geoCoder = new Geocoder(mActivity, Locale.getDefault());
+            //StringBuilder stringBuilder = new StringBuilder();
+            try {
+                List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
+                int maxLines = address.get(0).getMaxAddressLineIndex();
+                finalAddress = address.get(0).getAddressLine(maxLines-1);
+                System.out.println("*** Latitude: " + String.valueOf(lat));
+                System.out.println("*** Longitude: " + String.valueOf(lng));
+                System.out.println("*** Address: " + finalAddress);
+            } catch (IOException e) {}
+            catch (NullPointerException e) {}
+        } else {
+            System.out.println("*** Location not available");
+        }
+        */
+
+        String newSectionName = getResources().getString(R.string.meeting_on) + new SimpleDateFormat(" yyyy-MM-dd HH.mm").format(new Date());
+        if(mFinalAddress != null) {
+            String completeSectionName = newSectionName + " in " + mFinalAddress;
+            if(completeSectionName.length() <= 50)
+                newSectionName = completeSectionName;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setTitle(R.string.section_name);
 
         final EditText input = new EditText(mActivity);
         input.setInputType(InputType.TYPE_CLASS_TEXT/* | InputType.TYPE_TEXT_VARIATION_PASSWORD*/);
-        input.setText(getResources().getString(R.string.meeting_on) + new SimpleDateFormat(" yyyy-MM-dd HH.mm").format(new Date()));
+        //input.setText(getResources().getString(R.string.meeting_on) + new SimpleDateFormat(" yyyy-MM-dd HH.mm").format(new Date()) + finalAddress);
+        input.setText(newSectionName);
         input.selectAll();
         builder.setView(input);
 
@@ -1354,6 +1400,14 @@ if(true) {
             //mItem2 = (AbstractSnippet<T, Result>)
             //        SnippetContent.ITEMS.get(getArguments().getInt(ARG_ITEM_ID));
         }
+
+        mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        mLocationProvider = mLocationManager.getBestProvider(criteria, false);
+        Location location = mLocationManager.getLastKnownLocation(mLocationProvider);
+        if (location != null) {
+            onLocationChanged(location);
+        }
     }
 
     @Override
@@ -1387,6 +1441,7 @@ if(true) {
         }
 
         System.out.println("*** onActivityCreated");
+
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
 /*
@@ -1498,6 +1553,7 @@ if(true) {
     public void onResume() {
         System.out.println("*** onResume");
         super.onResume();
+        mLocationManager.requestLocationUpdates(mLocationProvider, 400, 1.0f, this);
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -1526,6 +1582,51 @@ if(true) {
         } else if (User.isMsa()) {
             mLiveAuthClient.loginSilent(BaseActivity.sSCOPES, this);
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mLocationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+
+        Geocoder geoCoder = new Geocoder(mActivity, Locale.getDefault());
+        StringBuilder builder = new StringBuilder();
+        try {
+            List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
+            int maxLines = address.get(0).getMaxAddressLineIndex();
+            /*
+            for (int i=0; i<maxLines; i++) {
+                String addressStr = address.get(0).getAddressLine(i);
+                builder.append(addressStr);
+                builder.append(" ");
+            }
+            String finalAddress = builder.toString();
+            */
+            mFinalAddress = address.get(0).getAddressLine(maxLines - 1);
+        } catch (IOException e) {
+            mFinalAddress = null;
+        }
+        catch (NullPointerException e) {
+            mFinalAddress = null;
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
     }
 
     private retrofit.Callback<String[]> getSetUpCallback0() {
