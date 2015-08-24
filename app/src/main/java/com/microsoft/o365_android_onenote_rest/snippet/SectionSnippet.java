@@ -6,6 +6,7 @@ package com.microsoft.o365_android_onenote_rest.snippet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.view.View;
 
 import com.google.gson.JsonObject;
 import com.microsoft.o365_android_onenote_rest.R;
@@ -44,6 +45,7 @@ public abstract class SectionSnippet<Result>
     public String mSiteCollectionId = null;
     public String mSiteId = null;
     public static Activity sActivity = null;
+    public static SnippetDetailFragment mFragment = null;
 
     public SectionSnippet(Integer descriptionArray) {
         super(SnippetCategory.sectionsSnippetCategory, descriptionArray);
@@ -278,6 +280,7 @@ public abstract class SectionSnippet<Result>
                             sitesMap.put(resultList.get(i).getName(), resultList.get(i));
                             System.out.println("*** Site: " + siteNames[i]);
                         }
+                        mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.success(siteNames, response);
                     }
 
@@ -291,6 +294,7 @@ public abstract class SectionSnippet<Result>
                                 .setPositiveButton(R.string.dismiss, null)
                                 .show();
                         */
+                        mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.failure(error);
                     }
 
@@ -326,6 +330,7 @@ public abstract class SectionSnippet<Result>
                             bookNames[i] = notebooks[i].name;
                             notebookMap.put(notebooks[i].name, notebooks[i]);
                         }
+                        mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.success(bookNames, response);
                     }
 
@@ -339,6 +344,7 @@ public abstract class SectionSnippet<Result>
                                 .setPositiveButton(R.string.dismiss, null)
                                 .show();
                         */
+                        mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.failure(error);
                     }
 
@@ -388,6 +394,7 @@ public abstract class SectionSnippet<Result>
                             sectionMap.put(sections[i].name, sections[i]);
                             System.out.println("*** Section: " + sectionNames[i]);
                         }
+                        mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.success(sectionNames, response);
                     }
 
@@ -402,6 +409,7 @@ public abstract class SectionSnippet<Result>
                                 .setPositiveButton(R.string.dismiss, null)
                                 .show();
                         */
+                        mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.failure(error);
                     }
 

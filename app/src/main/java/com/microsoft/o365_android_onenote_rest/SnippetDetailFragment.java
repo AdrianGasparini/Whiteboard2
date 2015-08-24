@@ -194,7 +194,7 @@ public class SnippetDetailFragment<T, Result>
 */
 
     @InjectView(progressbar)
-    protected ProgressBar mProgressbar;
+    public ProgressBar mProgressbar;
 
     @InjectView(btn_run)
     protected Button mRunButton;
@@ -237,6 +237,7 @@ public class SnippetDetailFragment<T, Result>
     public void setActivity(Activity activity) {
         mActivity = activity;
         SectionSnippet.sActivity = activity;
+        SectionSnippet.mFragment = this;
     }
 
     @OnClick(txt_request_url)
@@ -1237,6 +1238,7 @@ if(true) {
     @OnItemSelected(spinner0)
     public void onSpinner0ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
+        mProgressbar.setVisibility(View.VISIBLE);
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mPageId = null;
@@ -1283,12 +1285,14 @@ if(true) {
                         SectionSnippet item = (SectionSnippet) mItem;
                         item.mSiteCollectionId = siteMetadata.siteCollectionId;
                         item.mSiteId = siteMetadata.siteId;
+                        //mProgressbar.setVisibility(View.GONE);
                         item.fillNotebookSpinner(AbstractSnippet.sServices.mNotebooksService, getSetUpCallback(), item.notebookMap);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("*** Failure receiving site metadata");
+                        mProgressbar.setVisibility(View.GONE);
                     }
                 }
         );
@@ -1297,6 +1301,7 @@ if(true) {
     @OnItemSelected(spinner)
     public void onSpinnerItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
+        mProgressbar.setVisibility(View.VISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mPageId = null;
         //mNewSectionButton.setEnabled(false);
@@ -1322,6 +1327,7 @@ if(true) {
 
         mSetDefaultButton.setEnabled(true);
         mNewSectionButton.setEnabled(true);
+        //mProgressbar.setVisibility(View.GONE);
     }
 
     // TODO: remove if section id should not be read on spinner selection
@@ -1329,6 +1335,7 @@ if(true) {
     public void onSpinner2ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner2 selected: " + mSpinner2.getSelectedItem().toString());
         mPageId = null;
+        mProgressbar.setVisibility(View.VISIBLE);
         mRunButton.setEnabled(false);
         mPickPhotosButton.setEnabled(false);
         mOpenOneNoteButton.setEnabled(false);
@@ -1363,9 +1370,11 @@ if(true) {
                             mRunButton.setEnabled(true);
                             mPickPhotosButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
+                            mProgressbar.setVisibility(View.GONE);
                         } else {
                             //mRunButton.setEnabled(false);
                             //mOpenOneNoteButton.setEnabled(false);
+                            mProgressbar.setVisibility(View.GONE);
                             Toast toast = Toast.makeText(mActivity, R.string.section_without_page_msg, Toast.LENGTH_LONG);
                             toast.show();
                         }
@@ -1374,6 +1383,7 @@ if(true) {
                     @Override
                     public void failure(RetrofitError error) {
                         if (isAdded()) {
+                            mProgressbar.setVisibility(View.GONE);
                             displayThrowable(error);
                         }
                     }
@@ -1553,7 +1563,8 @@ if(true) {
     public void onResume() {
         System.out.println("*** onResume");
         super.onResume();
-        mLocationManager.requestLocationUpdates(mLocationProvider, 400, 1.0f, this);
+        //mLocationManager.requestLocationUpdates(mLocationProvider, 400, 1.0f, this);
+        mLocationManager.requestLocationUpdates(mLocationProvider, 60000, 100.0f, this);
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -1596,10 +1607,10 @@ if(true) {
         double lng = location.getLongitude();
 
         Geocoder geoCoder = new Geocoder(mActivity, Locale.getDefault());
-        StringBuilder builder = new StringBuilder();
+        //StringBuilder builder = new StringBuilder();
         try {
             List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
-            int maxLines = address.get(0).getMaxAddressLineIndex();
+            //int maxLines = address.get(0).getMaxAddressLineIndex();
             /*
             for (int i=0; i<maxLines; i++) {
                 String addressStr = address.get(0).getAddressLine(i);
@@ -1608,7 +1619,12 @@ if(true) {
             }
             String finalAddress = builder.toString();
             */
-            mFinalAddress = address.get(0).getAddressLine(maxLines - 1);
+            //mFinalAddress = address.get(0).getAddressLine(maxLines - 1);
+            String city = address.get(0).getLocality();
+            if (city != null && !city.equals("")) {
+                System.out.println("*** City: " + city);
+                mFinalAddress = city;
+            }
         } catch (IOException e) {
             mFinalAddress = null;
         }
