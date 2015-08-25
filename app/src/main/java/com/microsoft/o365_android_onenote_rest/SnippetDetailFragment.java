@@ -8,10 +8,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -22,6 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.CalendarContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -194,7 +197,7 @@ public class SnippetDetailFragment<T, Result>
 */
 
     @InjectView(progressbar)
-    public ProgressBar mProgressbar;
+    protected ProgressBar mProgressbar;
 
     @InjectView(btn_run)
     protected Button mRunButton;
@@ -236,8 +239,8 @@ public class SnippetDetailFragment<T, Result>
 
     public void setActivity(Activity activity) {
         mActivity = activity;
-        SectionSnippet.sActivity = activity;
-        SectionSnippet.mFragment = this;
+        //SectionSnippet.sActivity = activity;
+        //SectionSnippet.mFragment = this;
     }
 
     @OnClick(txt_request_url)
@@ -897,12 +900,65 @@ if(true) {
         }
         */
 
-        String newSectionName = getResources().getString(R.string.meeting_on) + new SimpleDateFormat(" yyyy-MM-dd HH.mm").format(new Date());
-        if(mFinalAddress != null) {
-            String completeSectionName = newSectionName + " in " + mFinalAddress;
+        /*
+        Uri.Builder eventsUriBuilder = CalendarContract.Instances.CONTENT_URI
+                .buildUpon();
+        ContentUris.appendId(eventsUriBuilder, new Date().getTime());
+        ContentUris.appendId(eventsUriBuilder, new Date().getTime());
+        //ContentUris.appendId(eventsUriBuilder, endOfToday);
+        Uri eventsUri = eventsUriBuilder.build();
+        Cursor cursor = null;
+        cursor = mActivity.getContentResolver().query(eventsUri, new String[] { "calendar_id", "title", "description",
+                "dtstart", "dtend", "eventLocation" }, null, null, CalendarContract.Instances.DTSTART + " ASC");
+        */
+        String eventTitle = null;
+        String eventLocation = null;
+        String eventDate = null;
+        Uri eventUri = Uri.parse("content://com.android.calendar/events");
+        long now = new Date().getTime();
+        Cursor cursor = mActivity.getContentResolver().query(eventUri, new String[] { "title",
+                        "dtstart", "dtend", "eventLocation" }, "(" + "dtstart" + "<=" + now + " and "
+                        + "dtend" + ">=" + now + ")", null, "dtstart DESC");
+        try {
+            if(cursor.getCount() > 0) {
+                if (cursor.moveToNext()) {
+                    eventTitle = cursor.getString(0);
+                    eventDate = new SimpleDateFormat("yyyy-MM-dd HH.mm").format(new Date(Long.parseLong(cursor.getString(1))));
+                    eventLocation = cursor.getString(3);
+                    System.out.println("*** Event: " + eventTitle + " " + eventLocation + " " + eventDate);
+                    /*
+                    String name = cursor.getString(0);
+                    String displayName = cursor.getString(1);
+                    // This is actually a better pattern:
+                    String color = cursor.getString(cursor.getColumnIndex(
+                            CalendarContract.Calendars.CALENDAR_COLOR));
+                    Boolean selected = !cursor.getString(3).equals("0");
+                    */
+                }
+            }
+        } catch (AssertionError ex) {
+            // TODO: log exception and bail
+            System.out.println("*** Error reading calendar event cursor: " + ex);
+        }
+
+        String newSectionName = null;
+        if(eventTitle != null)
+            newSectionName = eventTitle + " on ";
+        else
+            newSectionName = getResources().getString(R.string.meeting_on) + " ";
+        if(eventDate != null)
+            newSectionName = newSectionName + eventDate;
+        else
+            newSectionName = newSectionName + new SimpleDateFormat("yyyy-MM-dd HH.mm").format(new Date());
+        if(eventLocation == null)
+            eventLocation = mFinalAddress;
+        if(eventLocation != null) {
+            String completeSectionName = newSectionName + " in " + eventLocation;
             if(completeSectionName.length() <= 50)
                 newSectionName = completeSectionName;
         }
+        if(newSectionName.length() > 50)
+            newSectionName = newSectionName.substring(0, 49);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setTitle(R.string.section_name);
@@ -1085,6 +1141,7 @@ if(true) {
         System.out.println("*** onRefreshClicked");
         mProgressbar.setVisibility(View.VISIBLE);
 
+        /*
         sSiteName = sNotebookName = sSectionName = null;
         Object selectedSite = mSpinner0.getSelectedItem();
         if(selectedSite != null) {
@@ -1097,6 +1154,12 @@ if(true) {
                     sSectionName = selectedSection.toString();
             }
         }
+        */
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
+        sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
+        sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
         System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
 
         mSpinner0.setVisibility(View.INVISIBLE);
