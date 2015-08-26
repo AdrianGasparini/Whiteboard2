@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.CalendarContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +31,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -163,6 +162,9 @@ public class SnippetDetailFragment<T, Result>
     LocationManager mLocationManager = null;
     String mLocationProvider = null;
     String mFinalAddress = null;
+    boolean mInitializingSpinner0 = true;
+    boolean mInitializingSpinner1 = true;
+    boolean mInitializingSpinner2 = true;
 
     @InjectView(txt_status_code)
     protected TextView mStatusCode;
@@ -1298,6 +1300,7 @@ if(true) {
         launchUri(Uri.parse(mItem.getUrl()));
     }
 */
+
     @OnItemSelected(spinner0)
     public void onSpinner0ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
@@ -1312,10 +1315,13 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        //preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString()).commit();
-        preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString())
-            .putString(SharedPrefsUtil.PREF_NOTEBOOK, null)
-            .putString(SharedPrefsUtil.PREF_SECTION, null).apply();
+        if((!mInitializingSpinner0 && sSiteName == null) || (preferences.getString(SharedPrefsUtil.PREF_SITE, null) == null)) {
+            //preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString()).commit();
+            preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString())
+                    .putString(SharedPrefsUtil.PREF_NOTEBOOK, null)
+                    .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
+        }
+        mInitializingSpinner0 = false;
 
         SectionSnippet item = (SectionSnippet)mItem;
         //com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(this
@@ -1374,9 +1380,12 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        //preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString()).commit();
-        preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString())
-            .putString(SharedPrefsUtil.PREF_SECTION, null).apply();
+        if((!mInitializingSpinner1 && sNotebookName == null) || (preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null) == null)) {
+            //preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString()).commit();
+            preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString())
+                    .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
+        }
+        mInitializingSpinner1 = false;
 
         SectionSnippet item = (SectionSnippet)mItem;
         //Notebook notebook = (Notebook) item.notebookMap.get(this
@@ -1405,8 +1414,11 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        //preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
-        preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).apply();
+        if((!mInitializingSpinner2 && sSectionName == null) || (preferences.getString(SharedPrefsUtil.PREF_SECTION, null) == null)) {
+            //preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
+            preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
+        }
+        mInitializingSpinner2 = false;
 
         SectionSnippet item = (SectionSnippet)mItem;
         Section section = (Section) item.sectionMap.get(mSpinner2.getSelectedItem().toString());
@@ -1473,6 +1485,17 @@ if(true) {
             //mItem2 = (AbstractSnippet<T, Result>)
             //        SnippetContent.ITEMS.get(getArguments().getInt(ARG_ITEM_ID));
         }
+
+        //mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+        SharedPreferences preferences
+                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
+        sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
+        sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
+        System.out.println("*** Site: " + sSiteName);
+        System.out.println("*** Notebook: " + sNotebookName);
+        System.out.println("*** Section: " + sSectionName);
 
         mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -1629,6 +1652,7 @@ if(true) {
         //mLocationManager.requestLocationUpdates(mLocationProvider, 400, 1.0f, this);
         mLocationManager.requestLocationUpdates(mLocationProvider, 60000, 100.0f, this);
 
+        /*
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
@@ -1637,6 +1661,7 @@ if(true) {
         System.out.println("*** Site: " + sSiteName);
         System.out.println("*** Notebook: " + sNotebookName);
         System.out.println("*** Section: " + sSectionName);
+        */
 
         if (User.isOrg()) {
             //mAuthenticationManager.connect(this);
@@ -1738,6 +1763,7 @@ if(true) {
                             .setPositiveButton(R.string.dismiss, null)
                             .show();
                 }
+                sSiteName = null;
             }
 
             @Override
@@ -1747,6 +1773,7 @@ if(true) {
                     displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
                 }
+                sSiteName = null;
             }
         };
     }
@@ -1781,6 +1808,7 @@ if(true) {
                             .setPositiveButton(R.string.dismiss, null)
                             .show();
                 }
+                sNotebookName = null;
             }
 
             @Override
@@ -1790,6 +1818,7 @@ if(true) {
                     displayThrowable(error);
                     mProgressbar.setVisibility(View.GONE);
                 }
+                sNotebookName = null;
             }
         };
     }
@@ -1827,6 +1856,7 @@ if(true) {
                             .setPositiveButton(R.string.dismiss, null)
                             .show();
                 }*/
+                sSectionName = null;
             }
 
             @Override
@@ -1837,6 +1867,7 @@ if(true) {
                     mProgressbar.setVisibility(View.GONE);
                     mGotoDefault = false;
                 }
+                sSectionName = null;
             }
         };
     }
