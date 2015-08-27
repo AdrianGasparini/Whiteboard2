@@ -2,6 +2,7 @@
     <string name="app_name">Whiteboard</string>
     <string name="title_snippet_detail">Snippet Detail</string>
     <string name="beta">BETA</string>
+    <string name="page_title">Photos captured from Whiteboard</string>
     <string name="run">Capture image</string>
     <string name="new_section">New section</string>
     <string name="open_onenote">Open in OneNote</string>

@@ -151,7 +151,7 @@ public class SnippetDetailFragment<T, Result>
     File mPhotoFile = null;
     Activity mActivity;
     //Callback mCallback = this;
-    String mSectionName = null;
+    //String mSectionName = null;
     String mOneNoteClientUrl = null;
     //String mSiteCollectionId = null;
     //String mSiteId = null;
@@ -944,15 +944,15 @@ if(true) {
         }
 
         String newSectionName = null;
-        if(eventTitle != null)
+        if(eventTitle != null && !eventTitle.equals(""))
             newSectionName = eventTitle + " on ";
         else
             newSectionName = getResources().getString(R.string.meeting_on) + " ";
-        if(eventDate != null)
+        if(eventDate != null && !eventDate.equals(""))
             newSectionName = newSectionName + eventDate;
         else
             newSectionName = newSectionName + new SimpleDateFormat("yyyy-MM-dd HH.mm").format(new Date());
-        if(eventLocation == null)
+        if(eventLocation == null || eventLocation.equals(""))
             eventLocation = mFinalAddress;
         if(eventLocation != null) {
             String completeSectionName = newSectionName + " in " + eventLocation;
@@ -981,8 +981,8 @@ if(true) {
                 mOpenOneNoteButton.setEnabled(false);
 
                 /*final String*/
-                mSectionName = input.getText().toString();
-                System.out.println("*** New section name: " + mSectionName);
+                final String sectionName = input.getText().toString();
+                System.out.println("*** New section name: " + sectionName);
 
                 SectionSnippet item = (SectionSnippet) mItem;
                 AbstractSnippet.sServices.mSectionsService.postSectionSP(
@@ -991,7 +991,7 @@ if(true) {
                         item.mSiteId,
                         "application/json",
                         mNotebookId,
-                        createNewSection(mSectionName),
+                        createNewSection(sectionName),
                         //mCallback
                         new retrofit.Callback<Envelope>() {
                             @Override
@@ -1050,7 +1050,7 @@ if(true) {
 
                                                 System.out.println("*** Fetching sections");
                                                 SectionSnippet item = (SectionSnippet) mItem;
-                                                item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(), item.sectionMap, mNotebookId);
+                                                item.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(sectionName), item.sectionMap, mNotebookId);
 
                                                 //Toast toast = Toast.makeText(mActivity, R.string.section_created_msg, Toast.LENGTH_SHORT);
                                                 //toast.show();
@@ -1330,6 +1330,8 @@ if(true) {
         com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(
                 theSpinner.getSelectedItem().toString());
         System.out.println("*** Site URI: " + result.getUri());
+        String siteUri = result.getUri().toString();//.replace("%20", " ");
+        //System.out.println("*** Site URI: " + siteUri);
 /*
         System.out.println("*** Sync invocation of SiteMetadataService");
         SiteMetadata data = AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadataSync(
@@ -1345,7 +1347,7 @@ if(true) {
         System.out.println("*** Async invocation of SiteMetadataService");
         AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
                 mItem.getVersion(),
-                result.getUri(),
+                siteUri,
                 new retrofit.Callback<SiteMetadata>() {
                     @Override
                     public void success(SiteMetadata siteMetadata, Response response) {
@@ -1360,7 +1362,7 @@ if(true) {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        System.out.println("*** Failure receiving site metadata");
+                        System.out.println("*** Failure receiving site metadata: " + error);
                         mProgressbar.setVisibility(View.GONE);
                     }
                 }
@@ -1440,8 +1442,15 @@ if(true) {
                     @Override
                     public void success(Envelope<Page> env, Response response) {
                         if (env.value.length > 0) {
-                            mPageId = env.value[0].id;
-                            mOneNoteClientUrl = env.value[0].links.oneNoteClientUrl.href;
+                            int i;
+                            for(i = 0; i < env.value.length; i++) {
+                                if(env.value[0].title.equals(R.string.page_title))
+                                    break;
+                            }
+                            if(i >= env.value.length)
+                                i = 0;
+                            mPageId = env.value[i].id;
+                            mOneNoteClientUrl = env.value[i].links.oneNoteClientUrl.href;
                             mRunButton.setEnabled(true);
                             mPickPhotosButton.setEnabled(true);
                             mOpenOneNoteButton.setEnabled(true);
@@ -1873,7 +1882,7 @@ if(true) {
     }
 
     // select new section
-    private retrofit.Callback<String[]> getSetUpCallback3() {
+    private retrofit.Callback<String[]> getSetUpCallback3(final String sectionName) {
         return new retrofit.Callback<String[]>() {
             @Override
             public void success(String[] strings, Response response) {
@@ -1888,7 +1897,7 @@ if(true) {
                         mSpinner2.post(new Runnable() {
                             @Override
                             public void run() {
-                                mSpinner2.setSelection(((ArrayAdapter) mSpinner2.getAdapter()).getPosition(mSectionName), true);
+                                mSpinner2.setSelection(((ArrayAdapter) mSpinner2.getAdapter()).getPosition(sectionName), true);
                             }
                         });
                         mProgressbar.setVisibility(View.GONE);
