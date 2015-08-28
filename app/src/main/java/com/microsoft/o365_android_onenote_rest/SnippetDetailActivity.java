@@ -6,6 +6,8 @@ package com.microsoft.o365_android_onenote_rest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+//import android.support.v7.app.ActionBar;
+//import android.view.Menu;
 import android.view.MenuItem;
 
 
@@ -17,7 +19,8 @@ public class SnippetDetailActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snippet_detail);
         if (null != getSupportActionBar()) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
@@ -41,6 +44,19 @@ public class SnippetDetailActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false);      // Disable the button
+            actionBar.setDisplayHomeAsUpEnabled(false); // Remove the left caret
+            actionBar.setDisplayShowHomeEnabled(false); // Remove the icon
+        }
+        return true;
+    }
+    */
 }
 // *********************************************************
 //

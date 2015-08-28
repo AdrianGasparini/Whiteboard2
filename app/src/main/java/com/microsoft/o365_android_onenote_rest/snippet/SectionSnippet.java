@@ -4,8 +4,10 @@
 
 package com.microsoft.o365_android_onenote_rest.snippet;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.view.Menu;
 import android.view.View;
 
 import com.google.gson.JsonObject;

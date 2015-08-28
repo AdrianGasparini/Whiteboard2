@@ -162,9 +162,9 @@ public class SnippetDetailFragment<T, Result>
     LocationManager mLocationManager = null;
     String mLocationProvider = null;
     String mFinalAddress = null;
-    boolean mInitializingSpinner0 = true;
-    boolean mInitializingSpinner1 = true;
-    boolean mInitializingSpinner2 = true;
+    //boolean mInitializingSpinner0 = true;
+    //boolean mInitializingSpinner1 = true;
+    //boolean mInitializingSpinner2 = true;
 
     @InjectView(txt_status_code)
     protected TextView mStatusCode;
@@ -1315,13 +1315,13 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        if((!mInitializingSpinner0 && sSiteName == null) || (preferences.getString(SharedPrefsUtil.PREF_SITE, null) == null)) {
+        if((/*!mInitializingSpinner0 &&*/ sSiteName == null) || (preferences.getString(SharedPrefsUtil.PREF_SITE, null) == null)) {
             //preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString()).commit();
             preferences.edit().putString(SharedPrefsUtil.PREF_SITE, theSpinner.getSelectedItem().toString())
                     .putString(SharedPrefsUtil.PREF_NOTEBOOK, null)
                     .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
         }
-        mInitializingSpinner0 = false;
+        //mInitializingSpinner0 = false;
 
         SectionSnippet item = (SectionSnippet)mItem;
         //com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) item.siteMap.get(this
@@ -1364,6 +1364,7 @@ if(true) {
                     public void failure(RetrofitError error) {
                         System.out.println("*** Failure receiving site metadata: " + error);
                         mProgressbar.setVisibility(View.GONE);
+                        displayThrowable(error);
                     }
                 }
         );
@@ -1382,12 +1383,12 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        if((!mInitializingSpinner1 && sNotebookName == null) || (preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null) == null)) {
+        if((/*!mInitializingSpinner1 &&*/ sNotebookName == null) || (preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null) == null)) {
             //preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString()).commit();
             preferences.edit().putString(SharedPrefsUtil.PREF_NOTEBOOK, theSpinner.getSelectedItem().toString())
                     .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
         }
-        mInitializingSpinner1 = false;
+        //mInitializingSpinner1 = false;
 
         SectionSnippet item = (SectionSnippet)mItem;
         //Notebook notebook = (Notebook) item.notebookMap.get(this
@@ -1416,11 +1417,11 @@ if(true) {
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        if((!mInitializingSpinner2 && sSectionName == null) || (preferences.getString(SharedPrefsUtil.PREF_SECTION, null) == null)) {
+        if((/*!mInitializingSpinner2 &&*/ sSectionName == null) || (preferences.getString(SharedPrefsUtil.PREF_SECTION, null) == null)) {
             //preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
             preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
         }
-        mInitializingSpinner2 = false;
+        //mInitializingSpinner2 = false;
 
         SectionSnippet item = (SectionSnippet)mItem;
         Section section = (Section) item.sectionMap.get(mSpinner2.getSelectedItem().toString());
@@ -1508,8 +1509,13 @@ if(true) {
 
         mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        mLocationProvider = mLocationManager.getBestProvider(criteria, false);
-        Location location = mLocationManager.getLastKnownLocation(mLocationProvider);
+        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+        mLocationProvider = mLocationManager.getBestProvider(criteria, true);
+        System.out.println("*** Location provider: " + mLocationProvider);
+        Location location = null;
+        if(mLocationProvider != null) {
+            location = mLocationManager.getLastKnownLocation(mLocationProvider);
+        }
         if (location != null) {
             onLocationChanged(location);
         }
