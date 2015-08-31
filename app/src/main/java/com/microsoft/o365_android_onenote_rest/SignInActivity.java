@@ -258,7 +258,9 @@ public class SignInActivity
     }
 
     private void start() {
-        Intent appLaunch = new Intent(this, SnippetListActivity.class);
+        //Intent appLaunch = new Intent(this, SnippetListActivity.class);
+        Intent appLaunch = new Intent(this, SnippetDetailActivity.class);
+        appLaunch.putExtra(SnippetDetailFragment.ARG_ITEM_ID, 34);
         startActivity(appLaunch);
     }
 
