@@ -149,7 +149,7 @@ public class SnippetDetailFragment<T, Result>
     String mPageId = null;
     String mCurrentPhotoPath = null;
     File mPhotoFile = null;
-    Activity mActivity;
+    //Activity mActivity;
     //Callback mCallback = this;
     //String mSectionName = null;
     String mOneNoteClientUrl = null;
@@ -238,13 +238,13 @@ public class SnippetDetailFragment<T, Result>
 
     public SnippetDetailFragment() {
     }
-
+/*
     public void setActivity(Activity activity) {
         mActivity = activity;
         //SectionSnippet.sActivity = activity;
         //SectionSnippet.mFragment = this;
     }
-
+*/
     @OnClick(txt_request_url)
     public void onRequestUrlClicked(TextView tv) {
         clipboard(tv);
@@ -469,7 +469,7 @@ public class SnippetDetailFragment<T, Result>
                             mRunButton.setEnabled(true);
                             mPickPhotosButton.setEnabled(true);
                             //mOpenOneNoteButton.setEnabled(true);
-                            Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
+                            Toast toast = Toast.makeText(getActivity(), R.string.photo_saved, Toast.LENGTH_SHORT);
                             toast.show();
                         }
 
@@ -685,7 +685,7 @@ if(true) {
                     InputStream is = null;
                     File photoFile = null;
                     try {
-                        is = mActivity.getContentResolver().openInputStream(uri);
+                        is = getActivity().getContentResolver().openInputStream(uri);
                         photoFile = createImageFile();
                         FileOutputStream os = new FileOutputStream(photoFile);
                         int read = 0;
@@ -746,7 +746,7 @@ if(true) {
                                 mRunButton.setEnabled(true);
                                 mPickPhotosButton.setEnabled(true);
                                 //mOpenOneNoteButton.setEnabled(true);
-                                Toast toast = Toast.makeText(mActivity, R.string.photo_saved, Toast.LENGTH_SHORT);
+                                Toast toast = Toast.makeText(getActivity(), R.string.photo_saved, Toast.LENGTH_SHORT);
                                 toast.show();
                             }
 
@@ -918,7 +918,7 @@ if(true) {
         String eventDate = null;
         Uri eventUri = Uri.parse("content://com.android.calendar/events");
         long now = new Date().getTime();
-        Cursor cursor = mActivity.getContentResolver().query(eventUri, new String[] { "title",
+        Cursor cursor = getActivity().getContentResolver().query(eventUri, new String[] { "title",
                         "dtstart", "dtend", "eventLocation" }, "(" + "dtstart" + "<=" + now + " and "
                         + "dtend" + ">=" + now + ")", null, "dtstart DESC");
         try {
@@ -962,10 +962,10 @@ if(true) {
         if(newSectionName.length() > 50)
             newSectionName = newSectionName.substring(0, 49);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.section_name);
 
-        final EditText input = new EditText(mActivity);
+        final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT/* | InputType.TYPE_TEXT_VARIATION_PASSWORD*/);
         //input.setText(getResources().getString(R.string.meeting_on) + new SimpleDateFormat(" yyyy-MM-dd HH.mm").format(new Date()) + finalAddress);
         input.setText(newSectionName);
@@ -1197,7 +1197,7 @@ if(true) {
 
         mGotoDefaultButton.setEnabled(true);
 
-        Toast toast = Toast.makeText(mActivity, R.string.set_default_msg, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getActivity(), R.string.set_default_msg, Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -1460,7 +1460,7 @@ if(true) {
                             //mRunButton.setEnabled(false);
                             //mOpenOneNoteButton.setEnabled(false);
                             mProgressbar.setVisibility(View.GONE);
-                            Toast toast = Toast.makeText(mActivity, R.string.section_without_page_msg, Toast.LENGTH_LONG);
+                            Toast toast = Toast.makeText(getActivity(), R.string.section_without_page_msg, Toast.LENGTH_LONG);
                             toast.show();
                         }
                     }
@@ -1489,14 +1489,8 @@ if(true) {
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("*** onCreate");
         super.onCreate(savedInstanceState);
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            mItem = (AbstractSnippet<T, Result>)
-                    SnippetContent.ITEMS.get(getArguments().getInt(ARG_ITEM_ID));
-            //mItem2 = (AbstractSnippet<T, Result>)
-            //        SnippetContent.ITEMS.get(getArguments().getInt(ARG_ITEM_ID));
-        }
 
-        //mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        //mActivity = getActivity();
 
         SharedPreferences preferences
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
@@ -1507,7 +1501,16 @@ if(true) {
         System.out.println("*** Notebook: " + sNotebookName);
         System.out.println("*** Section: " + sSectionName);
 
-        mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        if (getArguments().containsKey(ARG_ITEM_ID)) {
+            mItem = (AbstractSnippet<T, Result>)
+                    SnippetContent.ITEMS.get(getArguments().getInt(ARG_ITEM_ID));
+            //mItem2 = (AbstractSnippet<T, Result>)
+            //        SnippetContent.ITEMS.get(getArguments().getInt(ARG_ITEM_ID));
+        }
+
+        //mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
         mLocationProvider = mLocationManager.getBestProvider(criteria, true);
@@ -1709,7 +1712,7 @@ if(true) {
         double lat = location.getLatitude();
         double lng = location.getLongitude();
 
-        Geocoder geoCoder = new Geocoder(mActivity, Locale.getDefault());
+        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
         //StringBuilder builder = new StringBuilder();
         try {
             List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
@@ -1908,7 +1911,7 @@ if(true) {
                         });
                         mProgressbar.setVisibility(View.GONE);
                         mSpinner2.setVisibility(VISIBLE);
-                        Toast toast = Toast.makeText(mActivity, R.string.section_created_msg, Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText(getActivity(), R.string.section_created_msg, Toast.LENGTH_SHORT);
                         toast.show();
                     }
                 }/* else if (isAdded() && strings.length <= 0 && null != response) {

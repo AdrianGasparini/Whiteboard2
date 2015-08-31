@@ -86,7 +86,7 @@ public class SnippetListActivity extends BaseActivity
             Bundle arguments = new Bundle();
             arguments.putInt(SnippetDetailFragment.ARG_ITEM_ID, position);
             SnippetDetailFragment fragment = new SnippetDetailFragment();
-            fragment.setActivity(this);
+            //fragment.setActivity(this);
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.snippet_detail_container, fragment)
