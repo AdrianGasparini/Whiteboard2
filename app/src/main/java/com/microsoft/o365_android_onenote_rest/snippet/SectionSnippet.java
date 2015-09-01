@@ -379,7 +379,7 @@ public abstract class SectionSnippet<Result>
                 mSiteId,
                 notebookId,
                 null,
-                null,
+                "lastModifiedTime desc",
                 null,
                 null,
                 null,

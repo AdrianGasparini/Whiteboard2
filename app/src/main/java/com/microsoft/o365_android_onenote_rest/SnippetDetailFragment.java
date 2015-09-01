@@ -1161,7 +1161,8 @@ if(true) {
                 = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
         sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
-        sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
+        //sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
+        sSectionName = null;
         System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
 
         mSpinner0.setVisibility(View.INVISIBLE);
