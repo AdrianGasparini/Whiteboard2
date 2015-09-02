@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.microsoft.live.LiveAuthClient;
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.onenoteapi.service.GsonDateTime;
@@ -24,7 +24,7 @@ import retrofit.converter.GsonConverter;
 
 @Module(library = true,
         injects = {
-                SnippetApp.class
+                WhiteboardApp.class
         }
 )
 public class AppModule {
@@ -54,7 +54,7 @@ public class AppModule {
             public void intercept(RequestFacade request) {
                 // apply the Authorization header if we had a token...
                 final SharedPreferences preferences
-                        = SnippetApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+                        = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
                 final String token =
                         preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN, null);
                 if (null != token) {
@@ -72,7 +72,7 @@ public RequestInterceptors providesRequestInterceptor() {
         public void intercept(RequestFacade request) {
             // apply the Authorization header if we had a token...
             final SharedPreferences preferences
-                    = SnippetApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+                    = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             final String token =
                     preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN, null);
             System.out.println("*** token1: " + token);
@@ -87,7 +87,7 @@ public RequestInterceptors providesRequestInterceptor() {
             // apply the Authorization header if we had a token...
             System.out.println("*** RequestInterceptor2.intercept");
             final SharedPreferences preferences
-                    = SnippetApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+                    = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             final String token =
                     preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN2, null);
             System.out.println("*** token2: " + token);
@@ -102,7 +102,7 @@ public RequestInterceptors providesRequestInterceptor() {
     @Provides
     @Singleton
     public LiveAuthClient providesLiveAuthClient() {
-        return new LiveAuthClient(SnippetApp.getApp(), ServiceConstants.MSA_CLIENT_ID);
+        return new LiveAuthClient(WhiteboardApp.getApp(), ServiceConstants.MSA_CLIENT_ID);
     }
 }
 // *********************************************************

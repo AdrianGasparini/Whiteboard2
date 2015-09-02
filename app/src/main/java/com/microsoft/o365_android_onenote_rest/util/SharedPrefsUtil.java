@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.live.LiveConnectSession;
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 
 public class SharedPrefsUtil {
@@ -23,7 +23,7 @@ public class SharedPrefsUtil {
     public static final String PREF_DEFAULT_NOTEBOOK = "PREF_DEFAULT_NOTEBOOK";
 
     public static SharedPreferences getSharedPreferences() {
-        return SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+        return WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
     }
 
     public static void persistAuthToken(AuthenticationResult result) {

@@ -4,9 +4,7 @@
 
 package com.microsoft.o365_android_onenote_rest.snippet;
 
-import com.google.gson.JsonObject;
-import com.microsoft.o365_android_onenote_rest.SnippetDetailFragment;
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.SectionsService;
 import com.microsoft.onenotevos.Envelope;
@@ -22,16 +20,18 @@ import java.util.Map;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.mime.TypedString;
+import retrofit.Callback;
 
+/*
 import static com.microsoft.o365_android_onenote_rest.R.array.create_section;
 import static com.microsoft.o365_android_onenote_rest.R.array.get_all_sections;
 import static com.microsoft.o365_android_onenote_rest.R.array.get_metadata_of_section;
 import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_name;
 import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_notebook;
+*/
 
 public class Snippet
-        extends AbstractSnippet<SectionsService, String[]> {
+        extends AbstractSnippet/*<SectionsService, String[]>*/ {
 
     public Map<String, com.microsoft.sharepointvos.Result> siteMap = new HashMap<>();
     public Map<String, Notebook> notebookMap = new HashMap<>();
@@ -40,9 +40,11 @@ public class Snippet
     public String mSiteId = null;
 
     public Snippet() {
-        super(SnippetCategory.sectionsSnippetCategory, sections_specific_notebook, Input.Spinner);
+        //super(SnippetCategory.sectionsSnippetCategory, sections_specific_notebook, Input.Spinner);
+        super();
     }
 
+    /*
     public Snippet(Integer descriptionArray) {
         super(SnippetCategory.sectionsSnippetCategory, descriptionArray);
     }
@@ -50,19 +52,20 @@ public class Snippet
     public Snippet(Integer descriptionArray, Input input) {
         super(SnippetCategory.sectionsSnippetCategory, descriptionArray, input);
     }
+    */
 
     @Override
     public void setUp(Services services, final retrofit.Callback<String[]> callback) {
-        RestAdapter restAdapter = SnippetApp.getApp().getRestAdapter2();
+        RestAdapter restAdapter = WhiteboardApp.getApp().getRestAdapter2();
         SitesService sitesService = restAdapter.create(SitesService.class);
         fillSiteSpinner(sitesService, callback, siteMap);
 
         //fillNotebookSpinner(services.mNotebooksService, callback, notebookMap);
     }
 
-    @Override
-    public void request(SectionsService service, Callback callback) {
-        System.out.println("*** request");
+//    @Override
+//    public void request(SectionsService service, Callback callback) {
+//        System.out.println("*** request");
 /*
         Notebook notebook = notebookMap.get(callback
                 .getParams()
@@ -82,7 +85,7 @@ public class Snippet
                 callback
         );
 */
-    }
+//    }
 
     protected void fillSiteSpinner(
             SitesService sitesService,
@@ -120,10 +123,12 @@ public class Snippet
                         callback.failure(error);
                     }
 
+                    /*
                     @Override
                     public Map<String, String> getParams() {
                         return null;
                     }
+                    */
                 });
     }
 
@@ -170,10 +175,12 @@ public class Snippet
                         callback.failure(error);
                     }
 
+                    /*
                     @Override
                     public Map<String, String> getParams() {
                         return null;
                     }
+                    */
                 });
     }
 
@@ -199,7 +206,7 @@ public class Snippet
                 mSiteId,
                 notebookId,
                 null,
-                "lastModifiedTime desc",
+                "createdTime desc",
                 null,
                 null,
                 null,
@@ -235,10 +242,12 @@ public class Snippet
                         callback.failure(error);
                     }
 
+                    /*
                     @Override
                     public Map<String, String> getParams() {
                         return null;
                     }
+                    */
                 });
     }
 

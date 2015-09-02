@@ -25,11 +25,13 @@ public class SnippetDetailActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         if (savedInstanceState == null) {
+            /*
             Bundle arguments = new Bundle();
             arguments.putInt(SnippetDetailFragment.ARG_ITEM_ID,
                     getIntent().getIntExtra(SnippetDetailFragment.ARG_ITEM_ID, 0));
+            */
             SnippetDetailFragment fragment = new SnippetDetailFragment();
-            fragment.setArguments(arguments);
+            //fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.snippet_detail_container, fragment)
                     .commit();

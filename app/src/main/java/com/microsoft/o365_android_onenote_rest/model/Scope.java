@@ -3,7 +3,7 @@
 */
 package com.microsoft.o365_android_onenote_rest.model;
 
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 
 import static com.microsoft.o365_android_onenote_rest.R.string.on_base;
 import static com.microsoft.o365_android_onenote_rest.R.string.on_create;
@@ -57,7 +57,7 @@ public class Scope {
     }
 
     private static String getString(int res) {
-        return SnippetApp.getApp().getString(res);
+        return WhiteboardApp.getApp().getString(res);
     }
 }
 // *********************************************************

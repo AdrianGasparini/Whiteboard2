@@ -19,10 +19,10 @@ import com.microsoft.live.LiveAuthException;
 import com.microsoft.live.LiveAuthListener;
 import com.microsoft.live.LiveConnectSession;
 import com.microsoft.live.LiveStatus;
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
-import com.microsoft.o365_android_onenote_rest.snippet.SectionSnippet;
+//import com.microsoft.o365_android_onenote_rest.snippet.SectionSnippet;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.o365_android_onenote_rest.util.User;
 
@@ -77,7 +77,7 @@ public class SignInActivity
 */
         //doIt = !BaseActivity.mResourceId2.equals(null);
         SharedPreferences preferences
-                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
         doIt = (sharePointUrl != null);
         super.onCreate(savedInstanceState);
@@ -104,7 +104,7 @@ public class SignInActivity
         }
 */
         SharedPreferences preferences
-                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
         if(sharePointUrl == null) sharePointUrl = ServiceConstants.AUTHENTICATION_RESOURCE_ID2;
 
@@ -126,7 +126,7 @@ public class SignInActivity
                 //BaseActivity.mResourceId2 = sharePointUrl;
                 //SectionSnippet.mSharePointEndpoint = sharePointUrl;
                 SharedPreferences preferences
-                        = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                        = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
                 //String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
                 preferences.edit().putString(SharedPrefsUtil.PREF_SHAREPOINT_URL, sharePointUrl).commit();
                 try {

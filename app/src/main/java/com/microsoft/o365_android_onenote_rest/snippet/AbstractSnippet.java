@@ -4,7 +4,7 @@
 
 package com.microsoft.o365_android_onenote_rest.snippet;
 
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.util.User;
 import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.PagesService;
@@ -12,58 +12,62 @@ import com.microsoft.onenoteapi.service.SectionGroupsService;
 import com.microsoft.onenoteapi.service.SectionsService;
 import com.microsoft.onenoteapi.service.SiteMetadataService;
 
+/*
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.notebookSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.pagesSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sectionGroupsSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sectionsSnippetCategory;
 import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sitesSnippetCategory;
+*/
 
 /**
  * The base class for snippets
  *
- * @param <Service> the service which descendants will use to make their calls
- * @param <Result>  the expected object to be returned by the service
+// * @param <Service> the service which descendants will use to make their calls
+// * @param <Result>  the expected object to be returned by the service
  */
-public abstract class AbstractSnippet<Service, Result> {
+public abstract class AbstractSnippet/*<Service, Result>*/ {
 
     public static final Services sServices = new Services();
 
-    private String mName, mDesc, mSection, mUrl, mO365Version, mMSAVersion;
-    public final Service mService;
-    public final Input mInputArgs;
+    private String /*mName, mDesc, mSection, mUrl,*/ mO365Version = "beta", mMSAVersion = "v1.0";
+    //public final Service mService;
+    //public final Input mInputArgs;
 
+    /*
     private static final int sNameIndex = 0;
     private static final int sDescIndex = 1;
     private static final int sUrlIndex = 2;
     private static final int sO365VersionIndex = 3;
     private static final int sMSAVersionIndex = 4;
-
+    */
 
     /**
      * Snippet constructor
      *
-     * @param category         Snippet category (Notebook, sectionGroup, section, page)
-     * @param descriptionArray The String array for the specified snippet
+//     * @param category         Snippet category (Notebook, sectionGroup, section, page)
+//     * @param descriptionArray The String array for the specified snippet
      */
     public AbstractSnippet(
-            SnippetCategory<Service> category,
-            Integer descriptionArray) {
+            /*SnippetCategory<Service> category,
+            Integer descriptionArray*/) {
 
         //Get snippet configuration information from the
         //XML configuration for the snippet
-        getSnippetArrayContent(category, descriptionArray);
+        //getSnippetArrayContent(category, descriptionArray);
 
-        mService = category.mService;
-        mInputArgs = Input.None;
+        //mService = category.mService;
+        //mInputArgs = Input.None;
     }
 
     /**
      * Snippet constructor
      *
-     * @param category         Snippet category (Notebook, sectionGroup, section, page)
-     * @param descriptionArray The String array for the specified snippet
-     * @param inputArgs        any input arguments
+//     * @param category         Snippet category (Notebook, sectionGroup, section, page)
+//     * @param descriptionArray The String array for the specified snippet
+//     * @param inputArgs        any input arguments
      */
+    /*
     public AbstractSnippet(
             SnippetCategory<Service> category,
             Integer descriptionArray,
@@ -74,20 +78,22 @@ public abstract class AbstractSnippet<Service, Result> {
         getSnippetArrayContent(category, descriptionArray);
 
         mSection = category.mSection;
-        mService = category.mService;
-        mInputArgs = inputArgs;
+        //mService = category.mService;
+        //mInputArgs = inputArgs;
     }
+    */
 
     /**
      * Gets the items from the specified snippet XML string array and stores the values
      * in private class fields
      *
-     * @param category
-     * @param descriptionArray
+//     * @param category
+//     * @param descriptionArray
      */
+    /*
     private void getSnippetArrayContent(SnippetCategory<Service> category, Integer descriptionArray) {
         if (null != descriptionArray) {
-            String[] params = SnippetApp.getApp().getResources().getStringArray(descriptionArray);
+            String[] params = WhiteboardApp.getApp().getResources().getStringArray(descriptionArray);
 
             try {
                 mName = params[sNameIndex];
@@ -111,6 +117,7 @@ public abstract class AbstractSnippet<Service, Result> {
         }
         mSection = category.mSection;
     }
+    */
 
     public static class Services {
 
@@ -121,11 +128,18 @@ public abstract class AbstractSnippet<Service, Result> {
         public final SiteMetadataService mSiteMetadataService;
 
         Services() {
+            mNotebooksService = WhiteboardApp.getApp().getRestAdapter().create(NotebooksService.class);
+            mPagesService = WhiteboardApp.getApp().getRestAdapter().create(PagesService.class);
+            mSectionGroupsService = WhiteboardApp.getApp().getRestAdapter().create(SectionGroupsService.class);
+            mSectionsService = WhiteboardApp.getApp().getRestAdapter().create(SectionsService.class);
+            mSiteMetadataService = WhiteboardApp.getApp().getRestAdapter().create(SiteMetadataService.class);
+/*
             mNotebooksService = notebookSnippetCategory.mService;
             mPagesService = pagesSnippetCategory.mService;
             mSectionGroupsService = sectionGroupsSnippetCategory.mService;
             mSectionsService = sectionsSnippetCategory.mService;
             mSiteMetadataService = sitesSnippetCategory.mService;
+*/
         }
     }
 
@@ -152,6 +166,7 @@ public abstract class AbstractSnippet<Service, Result> {
     }
 
 
+    /*
     public String getName() {
         return mName;
     }
@@ -167,6 +182,7 @@ public abstract class AbstractSnippet<Service, Result> {
     public String getSection() {
         return mSection;
     }
+    */
 
     /**
      * Abstract declaration of method which subclasses must define to actually run the snippet
@@ -174,7 +190,7 @@ public abstract class AbstractSnippet<Service, Result> {
      * @param service  the service instance to use
      * @param callback the recipient of the result
      */
-    public abstract void request(Service service, Callback<Result> callback);
+    //public abstract void request(Service service, Callback<Result> callback);
 
 }
 // *********************************************************

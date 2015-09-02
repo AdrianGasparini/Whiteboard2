@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Whiteboard</string>
-    <string name="title_snippet_detail">Snippet Detail</string>
-    <string name="beta">BETA</string>
+    <string name="title_snippet_detail">Whiteboard</string>
     <string name="page_title">Photos captured from Whiteboard</string>
     <string name="run">Capture image</string>
     <string name="new_section">New section</string>
@@ -17,23 +16,11 @@
     <string name="section_name">Section Name</string>
     <string name="meeting_on">Meeting on</string>
     <string name="photo_saved">Photo(s) saved in notebook.</string>
-    <string name="req_url">Request URL</string>
-    <string name="req_headers">Request Headers</string>
-    <string name="req_body">Request Body</string>
-    <string name="response">Response</string>
-    <string name="response_headers">Response Headers</string>
-    <string name="response_body">Response Body</string>
-    <string name="docs"><u>Documentation</u></string>
-    <string name="status_code">HTTP Status Code</string>
     <string name="msa_hint">Sign in with the account you use for OneDrive, Xbox Live, Outlook.com, or other Microsoft services</string>
     <string name="o365_hint">Sign in with the account provided by your work or school to use with Office 365 or other Microsoft services</string>
     <string name="org_acct">Organizational Account</string>
     <string name="microsoft_acct">Microsoft Account</string>
-    <string name="launch_onenote">Open in OneNote</string>
-    <string name="launch_browser">Open in browser</string>
-    <string name="quick_links">Quick Links</string>
     <string name="dismiss">Dismiss</string>
-    <string name="clippy">copied to clipboard</string>
     <string name="token_err_title">Failed to acquire api token</string>
     <string name="token_err_msg">Office 365 has either failed to refresh the access token or is unavailable. To view the extended stacktrace, click \'Dismiss\' then view the Response Body section</string>
     <string name="disconnect">Disconnect</string>
@@ -48,6 +35,5 @@
     <string name="section_without_page_msg">Section without page. Please select a section with a page or create a new section.</string>
     <string name="section_created_msg">Section created.</string>
     <string name="set_default_msg">Selected site and notebook set as default.</string>
-    <string name="et_hint">&lt;Your text here&gt;</string>
     <string name="warning_clientid_redirecturi_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the ServiceConstants.java file and run again</string>
 </resources>

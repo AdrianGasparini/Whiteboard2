@@ -10,7 +10,7 @@ import android.content.SharedPreferences;
 import com.microsoft.AzureADModule;
 import com.microsoft.AzureAppCompatActivity;
 import com.microsoft.live.LiveAuthClient;
-import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
+import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.inject.AzureModule;
@@ -46,7 +46,7 @@ public abstract class BaseActivity
     @Override
     protected AzureADModule getAzureADModule() {
         SharedPreferences preferences
-                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
         System.out.println("*** BaseActivity.getAzureADModule: " + sharePointUrl);
         AzureADModule.Builder builder = new AzureADModule.Builder(this);
@@ -66,7 +66,7 @@ public abstract class BaseActivity
 
     @Override
     protected ObjectGraph getRootGraph() {
-        return SnippetApp.getApp().mObjectGraph;
+        return WhiteboardApp.getApp().mObjectGraph;
     }
 
     @Override

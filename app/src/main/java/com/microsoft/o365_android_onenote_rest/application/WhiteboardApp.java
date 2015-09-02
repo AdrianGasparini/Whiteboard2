@@ -4,29 +4,23 @@
 
 package com.microsoft.o365_android_onenote_rest.application;
 
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.text.InputType;
-import android.widget.EditText;
 
 import com.microsoft.o365_android_onenote_rest.BuildConfig;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.inject.RequestInterceptors;
-import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.Converter;
 import timber.log.Timber;
 
-public class SnippetApp extends Application {
+public class WhiteboardApp extends Application {
     /**
      * The {@link dagger.ObjectGraph} used by Dagger to fulfill <code>@inject</code> annotations
      *
@@ -36,7 +30,7 @@ public class SnippetApp extends Application {
      */
     public ObjectGraph mObjectGraph;
 
-    private static SnippetApp sSnippetApp;
+    private static WhiteboardApp sWhiteboardApp;
 
     @Inject
     protected String endpoint;
@@ -56,7 +50,7 @@ public class SnippetApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        sSnippetApp = this;
+        sWhiteboardApp = this;
         mObjectGraph = ObjectGraph.create(new AppModule());
         mObjectGraph.inject(this);
         if (BuildConfig.DEBUG) {
@@ -85,8 +79,8 @@ public class SnippetApp extends Application {
 */
     }
 
-    public static SnippetApp getApp() {
-        return sSnippetApp;
+    public static WhiteboardApp getApp() {
+        return sWhiteboardApp;
     }
 /*
     public RestAdapter getRestAdapter() {
@@ -109,9 +103,9 @@ public class SnippetApp extends Application {
 
     public RestAdapter getRestAdapter2() {
         SharedPreferences preferences
-                = SnippetApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+                = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
-        System.out.println("*** SnippetApp.getRestAdapter2: " + sharePointUrl);
+        System.out.println("*** WhiteboardApp.getRestAdapter2: " + sharePointUrl);
         return new RestAdapter.Builder()
                 .setEndpoint(sharePointUrl)   // TODO: change
                 .setLogLevel(logLevel)
