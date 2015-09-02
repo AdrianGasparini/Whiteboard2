@@ -29,8 +29,6 @@ public abstract class BaseActivity
         extends AzureAppCompatActivity
         implements ObjectGraphInjector {
 
-    //public static String mResourceId2 = "https://fcpkagXXX.sharepoint.com";
-
     @Inject
     protected LiveAuthClient mLiveAuthClient;
 
@@ -54,8 +52,7 @@ public abstract class BaseActivity
         AzureADModule.Builder builder = new AzureADModule.Builder(this);
         builder.validateAuthority(true)
                 .skipBroker(true)
-                .authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, sharePointUrl)   // TODO: change
-                //.authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, ServiceConstants.AUTHENTICATION_RESOURCE_ID)
+                .authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, sharePointUrl)
                 .authorityUrl(ServiceConstants.AUTHORITY_URL)
                 .redirectUri(ServiceConstants.REDIRECT_URI)
                 .clientId(ServiceConstants.CLIENT_ID);

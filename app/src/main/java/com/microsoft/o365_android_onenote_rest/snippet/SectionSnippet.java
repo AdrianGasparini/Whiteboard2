@@ -4,14 +4,7 @@
 
 package com.microsoft.o365_android_onenote_rest.snippet;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.view.Menu;
-import android.view.View;
-
 import com.google.gson.JsonObject;
-import com.microsoft.o365_android_onenote_rest.R;
 import com.microsoft.o365_android_onenote_rest.SnippetDetailFragment;
 import com.microsoft.o365_android_onenote_rest.application.SnippetApp;
 import com.microsoft.onenoteapi.service.NotebooksService;
@@ -40,14 +33,11 @@ import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_
 public abstract class SectionSnippet<Result>
         extends AbstractSnippet<SectionsService, Result> {
 
-    //public static String mSharePointEndpoint = null; // "https://fcpkag.sharepoint.com";
     public Map<String, com.microsoft.sharepointvos.Result> siteMap = new HashMap<>();
     public Map<String, Notebook> notebookMap = new HashMap<>();
     public Map<String, Section> sectionMap = new HashMap<>();
     public String mSiteCollectionId = null;
     public String mSiteId = null;
-    //public static Activity sActivity = null;
-    //public static SnippetDetailFragment mFragment = null;
 
     public SectionSnippet(Integer descriptionArray) {
         super(SnippetCategory.sectionsSnippetCategory, descriptionArray);

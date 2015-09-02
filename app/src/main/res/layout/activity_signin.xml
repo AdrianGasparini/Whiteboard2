@@ -9,36 +9,37 @@
     android:layout_marginTop="@dimen/activity_vertical_margin"
     android:orientation="vertical">
     <!--
+    <TextView
+        style="@style/detail_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/microsoft_acct" />
+
+    <LinearLayout
+        android:id="@+id/msa_signin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_margin="8dp"
+            android:layout_weight="0.3"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/msa" />
+
         <TextView
-            style="@style/detail_section"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/microsoft_acct" />
+            android:layout_weight="0.7"
+            android:text="@string/msa_hint" />
 
-        <LinearLayout
-            android:id="@+id/msa_signin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_margin="8dp"
-                android:layout_weight="0.3"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/msa" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.7"
-                android:text="@string/msa_hint" />
-
-        </LinearLayout>
+    </LinearLayout>
     -->
+
     <TextView
         style="@style/detail_section"
         android:layout_width="match_parent"

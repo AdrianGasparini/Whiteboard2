@@ -3,12 +3,14 @@
 */
 package com.microsoft.o365_android_onenote_rest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-//import android.support.v7.app.ActionBar;
-//import android.view.Menu;
 import android.view.MenuItem;
+
+import com.microsoft.o365_android_onenote_rest.inject.AppModule;
+import com.microsoft.o365_android_onenote_rest.util.User;
 
 
 public class SnippetDetailActivity extends BaseActivity {
@@ -27,14 +29,13 @@ public class SnippetDetailActivity extends BaseActivity {
             arguments.putInt(SnippetDetailFragment.ARG_ITEM_ID,
                     getIntent().getIntExtra(SnippetDetailFragment.ARG_ITEM_ID, 0));
             SnippetDetailFragment fragment = new SnippetDetailFragment();
-            //fragment.setActivity(this);
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.snippet_detail_container, fragment)
                     .commit();
         }
     }
-
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -44,19 +45,27 @@ public class SnippetDetailActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+*/
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setHomeButtonEnabled(false);      // Disable the button
-            actionBar.setDisplayHomeAsUpEnabled(false); // Remove the left caret
-            actionBar.setDisplayShowHomeEnabled(false); // Remove the icon
+    public void onDisconnectClicked() {
+        finish();
+
+        if (User.isOrg()) {
+            //mAuthenticationManager.disconnect();
+            mAuthenticationManagers.mAuthenticationManager1.disconnect();
+            mAuthenticationManagers.mAuthenticationManager2.disconnect();
+        } else if (User.isMsa()) {
+            mLiveAuthClient.logout(null);
         }
-        return true;
+        // drop the application shared preferences to clear any old auth tokens
+        getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE)
+                .edit() // get the editor
+                .clear() // clear it
+                .apply(); // asynchronously apply
+        Intent login = new Intent(this, SignInActivity.class);
+        login.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(login);
     }
-    */
 }
 // *********************************************************
 //

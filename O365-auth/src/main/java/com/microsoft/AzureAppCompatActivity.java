@@ -4,19 +4,12 @@
  */
 package com.microsoft;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
-import android.widget.EditText;
-
-import com.microsoft.aad.adal.AuthenticationContext;
 
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
-import microsoft.o365_android_easyauth.R;
 
 public abstract class AzureAppCompatActivity extends AppCompatActivity {
 
