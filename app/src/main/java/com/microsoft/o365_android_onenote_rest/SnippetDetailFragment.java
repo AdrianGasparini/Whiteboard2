@@ -1638,9 +1638,9 @@ if(true) {
                     System.out.println("*** onError: " + e);
                 }
             });
-        } else if (User.isMsa()) {
-            mLiveAuthClient.loginSilent(BaseActivity.sSCOPES, this);
-        }
+        } /*else if (User.isMsa()) {
+            mLiveAuthClient.loginSilent(BaseActivity.sSCOPES, this);  // TODO: uncomment if Microsoft account is needed
+        }*/
     }
 
     @Override

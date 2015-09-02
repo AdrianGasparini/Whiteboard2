@@ -15,7 +15,7 @@ import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.inject.AzureModule;
 import com.microsoft.o365_android_onenote_rest.inject.ObjectGraphInjector;
-import com.microsoft.o365_android_onenote_rest.model.Scope;
+//import com.microsoft.o365_android_onenote_rest.model.Scope;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 
 import java.util.ArrayList;
@@ -32,6 +32,8 @@ public abstract class BaseActivity
     @Inject
     protected LiveAuthClient mLiveAuthClient;
 
+    // TODO: uncomment if Microsoft account is needed (also in SnippetDetailFragment.onResume)
+    /*
     public static final Iterable<String> sSCOPES = new ArrayList<String>() {{
         for (Scope.wl scope : Scope.wl.values()) {
             Timber.i("Adding scope: " + scope);
@@ -42,6 +44,7 @@ public abstract class BaseActivity
             add(scope.getScope());
         }
     }};
+    */
 
     @Override
     protected AzureADModule getAzureADModule() {

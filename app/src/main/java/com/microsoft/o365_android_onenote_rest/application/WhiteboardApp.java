@@ -107,7 +107,7 @@ public class WhiteboardApp extends Application {
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
         System.out.println("*** WhiteboardApp.getRestAdapter2: " + sharePointUrl);
         return new RestAdapter.Builder()
-                .setEndpoint(sharePointUrl)   // TODO: change
+                .setEndpoint(sharePointUrl)
                 .setLogLevel(logLevel)
                 .setConverter(converter)
                 .setRequestInterceptor(mRequestInterceptors.requestInterceptor2)
