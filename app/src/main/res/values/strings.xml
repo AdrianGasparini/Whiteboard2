@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Whiteboard</string>
     <string name="title_snippet_detail">Whiteboard</string>
-    <string name="page_title">Photos captured from Whiteboard</string>
     <string name="run">Capture image</string>
     <string name="new_section">New section</string>
     <string name="open_onenote">Open in OneNote</string>
@@ -16,10 +15,8 @@
     <string name="section_name">Section Name</string>
     <string name="meeting_on">Meeting on</string>
     <string name="photo_saved">Photo(s) saved in notebook.</string>
-    <string name="msa_hint">Sign in with the account you use for OneDrive, Xbox Live, Outlook.com, or other Microsoft services</string>
     <string name="o365_hint">Sign in with the account provided by your work or school to use with Office 365 or other Microsoft services</string>
     <string name="org_acct">Organizational Account</string>
-    <string name="microsoft_acct">Microsoft Account</string>
     <string name="dismiss">Dismiss</string>
     <string name="token_err_title">Failed to acquire api token</string>
     <string name="token_err_msg">Office 365 has either failed to refresh the access token or is unavailable. To view the extended stacktrace, click \'Dismiss\' then view the Response Body section</string>

@@ -33,8 +33,7 @@ public class AzureADModule {
 
         private String
                 mAuthorityUrl, // the authority used to authenticate
-                //mAuthenticationResourceId, // the resource id used to authenticate
-                mAuthenticationResourceId1,
+                mAuthenticationResourceId1, // the resource ids used to authenticate
                 mAuthenticationResourceId2,
                 mSharedPreferencesFilename = SHARED_PREFS_DEFAULT_NAME,
                 mClientId,
@@ -50,17 +49,12 @@ public class AzureADModule {
             mAuthorityUrl = authorityUrl;
             return this;
         }
-/*
-        public Builder authenticationResourceId(String authenticationResourceId) {
-            mAuthenticationResourceId = authenticationResourceId;
+
+        public Builder authenticationResourceId(String authenticationResourceId1, String authenticationResourceId2) {
+            mAuthenticationResourceId1 = authenticationResourceId1;
+            mAuthenticationResourceId2 = authenticationResourceId2;
             return this;
         }
-*/
-public Builder authenticationResourceId(String authenticationResourceId1, String authenticationResourceId2) {
-    mAuthenticationResourceId1 = authenticationResourceId1;
-    mAuthenticationResourceId2 = authenticationResourceId2;
-    return this;
-}
 
         public Builder validateAuthority(boolean shouldEvaluate) {
             mValidateAuthority = shouldEvaluate;
@@ -111,19 +105,6 @@ public Builder authenticationResourceId(String authenticationResourceId1, String
     public static void skipBroker(boolean shouldSkip) {
         AuthenticationSettings.INSTANCE.setSkipBroker(shouldSkip);
     }
-/*
-    @Provides
-    public AuthenticationContext providesAuthenticationContext() {
-        try {
-            return new AuthenticationContext(
-                    mBuilder.mActivity,
-                    mBuilder.mAuthorityUrl,
-                    mBuilder.mValidateAuthority);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-*/
 
     @Provides
     public AuthenticationContexts providesAuthenticationContexts() {
@@ -145,7 +126,6 @@ public Builder authenticationResourceId(String authenticationResourceId1, String
 
     @Provides
     public AuthenticationManagers providesAuthenticationManagers(
-            /*AuthenticationContext authenticationContext*/
             AuthenticationContexts authenticationContexts) {
         AuthenticationManagers ms = new AuthenticationManagers();
         ms.mAuthenticationManager1 = new AuthenticationManager(
@@ -167,19 +147,6 @@ public Builder authenticationResourceId(String authenticationResourceId1, String
         return ms;
     }
 
-/*
-    @Provides
-    public AuthenticationManager providesAuthenticationManager(
-            AuthenticationContext authenticationContext) {
-        return new AuthenticationManager(
-                mBuilder.mActivity,
-                authenticationContext,
-                mBuilder.mAuthenticationResourceId,
-                mBuilder.mSharedPreferencesFilename,
-                mBuilder.mClientId,
-                mBuilder.mRedirectUri);
-    }
-*/
 }
 // *********************************************************
 //

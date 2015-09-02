@@ -46,10 +46,11 @@ public class AppModule {
         return new GsonConverter(GsonDateTime.getOneNoteBuilder()
                 .create());
     }
-/*
+
     @Provides()
-    public RequestInterceptor providesRequestInterceptor() {
-        return new RequestInterceptor() {
+    public RequestInterceptors providesRequestInterceptor() {
+        RequestInterceptors is = new RequestInterceptors();
+        is.requestInterceptor1 = new RequestInterceptor() {
             @Override
             public void intercept(RequestFacade request) {
                 // apply the Authorization header if we had a token...
@@ -57,47 +58,29 @@ public class AppModule {
                         = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
                 final String token =
                         preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN, null);
+                System.out.println("*** token1: " + token);
                 if (null != token) {
                     request.addHeader("Authorization", "Bearer " + token);
                 }
             }
         };
+        is.requestInterceptor2 = new RequestInterceptor() {
+            @Override
+            public void intercept(RequestFacade request) {
+                // apply the Authorization header if we had a token...
+                System.out.println("*** RequestInterceptor2.intercept");
+                final SharedPreferences preferences
+                        = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+                final String token =
+                        preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN2, null);
+                System.out.println("*** token2: " + token);
+                if (null != token) {
+                    request.addHeader("Authorization", "Bearer " + token);
+                }
+            }
+        };
+        return is;
     }
-*/
-@Provides()
-public RequestInterceptors providesRequestInterceptor() {
-    RequestInterceptors is = new RequestInterceptors();
-    is.requestInterceptor1 = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestFacade request) {
-            // apply the Authorization header if we had a token...
-            final SharedPreferences preferences
-                    = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-            final String token =
-                    preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN, null);
-            System.out.println("*** token1: " + token);
-            if (null != token) {
-                request.addHeader("Authorization", "Bearer " + token);
-            }
-        }
-    };
-    is.requestInterceptor2 = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestFacade request) {
-            // apply the Authorization header if we had a token...
-            System.out.println("*** RequestInterceptor2.intercept");
-            final SharedPreferences preferences
-                    = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-            final String token =
-                    preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN2, null);
-            System.out.println("*** token2: " + token);
-            if (null != token) {
-                request.addHeader("Authorization", "Bearer " + token);
-            }
-        }
-    };
-    return is;
-}
 
     @Provides
     @Singleton

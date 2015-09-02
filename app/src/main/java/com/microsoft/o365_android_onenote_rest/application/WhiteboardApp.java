@@ -56,42 +56,12 @@ public class WhiteboardApp extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
-/*
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("SharePoint URL");
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String sharePointUrl = input.getText().toString();
-                System.out.println("*** SharePoint URL: " + sharePointUrl);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-*/
     }
 
     public static WhiteboardApp getApp() {
         return sWhiteboardApp;
     }
-/*
-    public RestAdapter getRestAdapter() {
-        return new RestAdapter.Builder()
-                .setEndpoint(endpoint)
-                .setLogLevel(logLevel)
-                .setConverter(converter)
-                .setRequestInterceptor(requestInterceptor)
-                .build();
-    }
-*/
+
     public RestAdapter getRestAdapter() {
         return new RestAdapter.Builder()
                 .setEndpoint(endpoint)

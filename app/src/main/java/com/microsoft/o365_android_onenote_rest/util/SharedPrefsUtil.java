@@ -46,13 +46,6 @@ public class SharedPrefsUtil {
         User.isOrg(true);
     }
 
-    /*
-    public static void persistAuthToken2(LiveConnectSession session) {
-        setAccessToken2(session.getAccessToken());
-        User.isMsa(true);
-    }
-    */
-
     private static void setAccessToken2(String accessToken) {
         getSharedPreferences().edit().putString(PREF_AUTH_TOKEN2, accessToken).commit();
     }

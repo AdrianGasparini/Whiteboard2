@@ -22,16 +22,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.Callback;
 
-/*
-import static com.microsoft.o365_android_onenote_rest.R.array.create_section;
-import static com.microsoft.o365_android_onenote_rest.R.array.get_all_sections;
-import static com.microsoft.o365_android_onenote_rest.R.array.get_metadata_of_section;
-import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_name;
-import static com.microsoft.o365_android_onenote_rest.R.array.sections_specific_notebook;
-*/
-
 public class Snippet
-        extends AbstractSnippet/*<SectionsService, String[]>*/ {
+        extends AbstractSnippet {
 
     public Map<String, com.microsoft.sharepointvos.Result> siteMap = new HashMap<>();
     public Map<String, Notebook> notebookMap = new HashMap<>();
@@ -40,52 +32,15 @@ public class Snippet
     public String mSiteId = null;
 
     public Snippet() {
-        //super(SnippetCategory.sectionsSnippetCategory, sections_specific_notebook, Input.Spinner);
         super();
     }
-
-    /*
-    public Snippet(Integer descriptionArray) {
-        super(SnippetCategory.sectionsSnippetCategory, descriptionArray);
-    }
-
-    public Snippet(Integer descriptionArray, Input input) {
-        super(SnippetCategory.sectionsSnippetCategory, descriptionArray, input);
-    }
-    */
 
     @Override
     public void setUp(Services services, final retrofit.Callback<String[]> callback) {
         RestAdapter restAdapter = WhiteboardApp.getApp().getRestAdapter2();
         SitesService sitesService = restAdapter.create(SitesService.class);
         fillSiteSpinner(sitesService, callback, siteMap);
-
-        //fillNotebookSpinner(services.mNotebooksService, callback, notebookMap);
     }
-
-//    @Override
-//    public void request(SectionsService service, Callback callback) {
-//        System.out.println("*** request");
-/*
-        Notebook notebook = notebookMap.get(callback
-                .getParams()
-                .get(SnippetDetailFragment.ARG_SPINNER_SELECTION).toString());
-
-        service.getNotebookSectionsSP(
-                getVersion(),
-                mSiteCollectionId,
-                mSiteId,
-                notebook.id,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                callback
-        );
-*/
-//    }
 
     protected void fillSiteSpinner(
             SitesService sitesService,
@@ -105,30 +60,15 @@ public class Snippet
                             sitesMap.put(resultList.get(i).getName(), resultList.get(i));
                             System.out.println("*** Site: " + siteNames[i]);
                         }
-                        //mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.success(siteNames, response);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("*** fillSiteSpinner failure");
-                        /*
-                        AlertDialog.Builder builder = new AlertDialog.Builder(sActivity);
-                        builder.setTitle(R.string.err_setup)
-                                .setMessage(R.string.err_setup_msg)
-                                .setPositiveButton(R.string.dismiss, null)
-                                .show();
-                        */
-                        //mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.failure(error);
                     }
 
-                    /*
-                    @Override
-                    public Map<String, String> getParams() {
-                        return null;
-                    }
-                    */
                 });
     }
 
@@ -138,7 +78,6 @@ public class Snippet
             final Map<String, Notebook> notebookMap) {
         System.out.println("*** fillNotebookSpinner");
         notebooksService.getNotebooksSP(getVersion(),
-                //notebooksService.getSharedNotebooks(getVersion(),
                 mSiteCollectionId,
                 mSiteId,
                 null,
@@ -157,30 +96,15 @@ public class Snippet
                             bookNames[i] = notebooks[i].name;
                             notebookMap.put(notebooks[i].name, notebooks[i]);
                         }
-                        //mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.success(bookNames, response);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         System.out.println("*** fillNotebookSpinner failure");
-                        /*
-                        AlertDialog.Builder builder = new AlertDialog.Builder(sActivity);
-                        builder.setTitle(R.string.err_setup)
-                                .setMessage(R.string.err_setup_msg)
-                                .setPositiveButton(R.string.dismiss, null)
-                                .show();
-                        */
-                        //mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.failure(error);
                     }
 
-                    /*
-                    @Override
-                    public Map<String, String> getParams() {
-                        return null;
-                    }
-                    */
                 });
     }
 
@@ -190,16 +114,7 @@ public class Snippet
             final Map<String, Section> sectionMap,
             String notebookId) {
         System.out.println("*** fillSectionSpinner");
-/*
-        sectionsService.getSections(
-                getVersion(),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-*/
+
         sectionsService.getNotebookSectionsSP(
                 getVersion(),
                 mSiteCollectionId,
@@ -223,7 +138,6 @@ public class Snippet
                             sectionMap.put(sections[i].name, sections[i]);
                             System.out.println("*** Section: " + sectionNames[i]);
                         }
-                        //mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.success(sectionNames, response);
                     }
 
@@ -231,23 +145,9 @@ public class Snippet
                     public void failure(RetrofitError error) {
                         System.out.println("*** fillSectionSpinner failure");
                         sectionMap.clear();
-                        /*
-                        AlertDialog.Builder builder = new AlertDialog.Builder(sActivity);
-                        builder.setTitle(R.string.err_setup)
-                                .setMessage(R.string.err_setup_msg)
-                                .setPositiveButton(R.string.dismiss, null)
-                                .show();
-                        */
-                        //mFragment.mProgressbar.setVisibility(View.GONE);
                         callback.failure(error);
                     }
 
-                    /*
-                    @Override
-                    public Map<String, String> getParams() {
-                        return null;
-                    }
-                    */
                 });
     }
 

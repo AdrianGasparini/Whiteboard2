@@ -12,112 +12,22 @@ import com.microsoft.onenoteapi.service.SectionGroupsService;
 import com.microsoft.onenoteapi.service.SectionsService;
 import com.microsoft.onenoteapi.service.SiteMetadataService;
 
-/*
-import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.notebookSnippetCategory;
-import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.pagesSnippetCategory;
-import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sectionGroupsSnippetCategory;
-import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sectionsSnippetCategory;
-import static com.microsoft.o365_android_onenote_rest.snippet.SnippetCategory.sitesSnippetCategory;
-*/
-
 /**
  * The base class for snippets
  *
-// * @param <Service> the service which descendants will use to make their calls
-// * @param <Result>  the expected object to be returned by the service
  */
-public abstract class AbstractSnippet/*<Service, Result>*/ {
+public abstract class AbstractSnippet {
 
     public static final Services sServices = new Services();
 
-    private String /*mName, mDesc, mSection, mUrl,*/ mO365Version = "beta", mMSAVersion = "v1.0";
-    //public final Service mService;
-    //public final Input mInputArgs;
-
-    /*
-    private static final int sNameIndex = 0;
-    private static final int sDescIndex = 1;
-    private static final int sUrlIndex = 2;
-    private static final int sO365VersionIndex = 3;
-    private static final int sMSAVersionIndex = 4;
-    */
+    private String mO365Version = "beta", mMSAVersion = "v1.0";
 
     /**
      * Snippet constructor
      *
-//     * @param category         Snippet category (Notebook, sectionGroup, section, page)
-//     * @param descriptionArray The String array for the specified snippet
      */
-    public AbstractSnippet(
-            /*SnippetCategory<Service> category,
-            Integer descriptionArray*/) {
-
-        //Get snippet configuration information from the
-        //XML configuration for the snippet
-        //getSnippetArrayContent(category, descriptionArray);
-
-        //mService = category.mService;
-        //mInputArgs = Input.None;
+    public AbstractSnippet() {
     }
-
-    /**
-     * Snippet constructor
-     *
-//     * @param category         Snippet category (Notebook, sectionGroup, section, page)
-//     * @param descriptionArray The String array for the specified snippet
-//     * @param inputArgs        any input arguments
-     */
-    /*
-    public AbstractSnippet(
-            SnippetCategory<Service> category,
-            Integer descriptionArray,
-            Input inputArgs) {
-
-        //Get snippet configuration information from the
-        //XML configuration for the snippet
-        getSnippetArrayContent(category, descriptionArray);
-
-        mSection = category.mSection;
-        //mService = category.mService;
-        //mInputArgs = inputArgs;
-    }
-    */
-
-    /**
-     * Gets the items from the specified snippet XML string array and stores the values
-     * in private class fields
-     *
-//     * @param category
-//     * @param descriptionArray
-     */
-    /*
-    private void getSnippetArrayContent(SnippetCategory<Service> category, Integer descriptionArray) {
-        if (null != descriptionArray) {
-            String[] params = WhiteboardApp.getApp().getResources().getStringArray(descriptionArray);
-
-            try {
-                mName = params[sNameIndex];
-                mDesc = params[sDescIndex];
-                mUrl = params[sUrlIndex];
-                mO365Version = params[sO365VersionIndex];
-                mMSAVersion = params[sMSAVersionIndex];
-            } catch (IndexOutOfBoundsException ex) {
-                throw new RuntimeException(
-                        "Invalid array in "
-                                + category.mSection
-                                + " snippet XML file"
-                        , ex);
-            }
-        } else {
-            mName = category.mSection;
-            mDesc = mUrl = null;
-            mO365Version = null;
-            mMSAVersion = null;
-
-        }
-        mSection = category.mSection;
-    }
-    */
 
     public static class Services {
 
@@ -133,13 +43,6 @@ public abstract class AbstractSnippet/*<Service, Result>*/ {
             mSectionGroupsService = WhiteboardApp.getApp().getRestAdapter().create(SectionGroupsService.class);
             mSectionsService = WhiteboardApp.getApp().getRestAdapter().create(SectionsService.class);
             mSiteMetadataService = WhiteboardApp.getApp().getRestAdapter().create(SiteMetadataService.class);
-/*
-            mNotebooksService = notebookSnippetCategory.mService;
-            mPagesService = pagesSnippetCategory.mService;
-            mSectionGroupsService = sectionGroupsSnippetCategory.mService;
-            mSectionsService = sectionsSnippetCategory.mService;
-            mSiteMetadataService = sitesSnippetCategory.mService;
-*/
         }
     }
 
@@ -148,13 +51,7 @@ public abstract class AbstractSnippet/*<Service, Result>*/ {
         // Optional method....
         callback.success(new String[]{}, null);
     }
-/*
-    public void setUp2(Services services, retrofit.Callback<String[]> callback, retrofit.Callback<String[]> callback2) {
-        // Optional method....
-        callback.success(new String[]{}, null);
-        callback2.success(new String[]{}, null);
-    }
-*/
+
     /**
      * Returns the version segment of the endpoint url with input from
      * XML snippet description and authentication method (Office 365, MSA)
@@ -164,33 +61,6 @@ public abstract class AbstractSnippet/*<Service, Result>*/ {
     public String getVersion() {
         return User.isMsa() ? mMSAVersion : mO365Version;
     }
-
-
-    /*
-    public String getName() {
-        return mName;
-    }
-
-    public String getDescription() {
-        return mDesc;
-    }
-
-    public String getUrl() {
-        return mUrl;
-    }
-
-    public String getSection() {
-        return mSection;
-    }
-    */
-
-    /**
-     * Abstract declaration of method which subclasses must define to actually run the snippet
-     *
-     * @param service  the service instance to use
-     * @param callback the recipient of the result
-     */
-    //public abstract void request(Service service, Callback<Result> callback);
 
 }
 // *********************************************************

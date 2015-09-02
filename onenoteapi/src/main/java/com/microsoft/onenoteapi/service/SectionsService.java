@@ -70,7 +70,6 @@ public interface SectionsService {
             Callback<Envelope<Section>> callback
     );
 
-    //@GET("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/sections")
     @GET("/{version}/myorganization/siteCollections/{sitecollectionid}/sites/{siteid}/notes/notebooks/{notebookId}/sections")
     void getNotebookSectionsSP(
             @Path("version") String version,

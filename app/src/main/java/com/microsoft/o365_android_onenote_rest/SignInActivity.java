@@ -22,7 +22,6 @@ import com.microsoft.live.LiveStatus;
 import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
-//import com.microsoft.o365_android_onenote_rest.snippet.SectionSnippet;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 import com.microsoft.o365_android_onenote_rest.util.User;
 
@@ -33,7 +32,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-//import static com.microsoft.o365_android_onenote_rest.R.id.msa_signin;
 import static com.microsoft.o365_android_onenote_rest.R.id.o365_signin;
 
 public class SignInActivity
@@ -43,39 +41,7 @@ public class SignInActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         System.out.println("*** SignInActivity.onCreate");
-/*
-        SignInActivity.super.onCreate(savedInstanceState);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("SharePoint URL");
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String sharePointUrl = input.getText().toString();
-                System.out.println("*** SharePoint URL: " + sharePointUrl);
-                BaseActivity.mResourceId2 = "https://fcpkag.sharepoint.com";
-                //SignInActivity.super.onCreate(savedInstanceState);
-                setContentView(R.layout.activity_signin);
-                if (User.isOrg()) {
-                    //mAuthenticationManager.connect(this);
-                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
-                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-                }
-                ButterKnife.inject(SignInActivity.this);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-*/
-        //doIt = !BaseActivity.mResourceId2.equals(null);
         SharedPreferences preferences
                 = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
@@ -85,7 +51,6 @@ public class SignInActivity
         setContentView(R.layout.activity_signin);
 
         if (User.isOrg()) {
-            //mAuthenticationManager.connect(this);
             mAuthenticationManagers.mAuthenticationManager1.connect(this);
             mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
         }
@@ -96,13 +61,7 @@ public class SignInActivity
     @OnClick(o365_signin)
     public void onSignInO365Clicked() {
         System.out.println("*** onSignInO365Clicked");
-/*
-        try {
-            authenticateOrganization();
-        } catch (IllegalArgumentException e) {
-            warnBadClient();
-        }
-*/
+
         SharedPreferences preferences
                 = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
@@ -123,11 +82,8 @@ public class SignInActivity
                 if (sharePointUrl.equals(""))
                     sharePointUrl = ServiceConstants.AUTHENTICATION_RESOURCE_ID2;  // default URL
                 System.out.println("*** SharePoint URL: " + sharePointUrl);
-                //BaseActivity.mResourceId2 = sharePointUrl;
-                //SectionSnippet.mSharePointEndpoint = sharePointUrl;
                 SharedPreferences preferences
                         = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-                //String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
                 preferences.edit().putString(SharedPrefsUtil.PREF_SHAREPOINT_URL, sharePointUrl).commit();
                 try {
                     doIt();
@@ -137,14 +93,6 @@ public class SignInActivity
                 }
             }
         });
-        /*
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        */
         builder.show();
     }
 
@@ -179,47 +127,20 @@ public class SignInActivity
                 public void onAuthComplete(LiveStatus status,
                                            LiveConnectSession session,
                                            Object userState) {
-                    //mAuthenticationManager.connect(SignInActivity.this);
                     mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
                     mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
                 }
 
                 @Override
                 public void onAuthError(LiveAuthException exception, Object userState) {
-                    //mAuthenticationManager.connect(SignInActivity.this);
                     mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
                     mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
                 }
             });
         } else {
             System.out.println("*** SignInActivity.authenticateOrganization");
-            //mAuthenticationManager.connect(this);
             mAuthenticationManagers.mAuthenticationManager1.connect(this);
             mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-            /*
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("SharePoint URL");
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String sharePointUrl = input.getText().toString();
-                    System.out.println("*** SharePoint URL: " + sharePointUrl);
-                    BaseActivity.mResourceId2 = "https://fcpkag.sharepoint.com";
-                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
-                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
-            */
         }
     }
 
@@ -227,28 +148,6 @@ public class SignInActivity
         UUID.fromString(ServiceConstants.CLIENT_ID);
         URI.create(ServiceConstants.REDIRECT_URI);
     }
-
-    /*
-    @OnClick(msa_signin)
-    public void onSignInMsaClicked() {
-        authenticateMsa();
-    }
-
-    private void authenticateMsa() {
-        try {
-            validateMsaArgs();
-            mLiveAuthClient.login(this, sSCOPES, this);
-        } catch (IllegalArgumentException e) {
-            warnBadClient();
-        }
-    }
-
-    private void validateMsaArgs() throws IllegalArgumentException {
-        if (ServiceConstants.MSA_CLIENT_ID.equals("<Your MSA CLIENT ID>")) {
-            throw new IllegalArgumentException();
-        }
-    }
-    */
 
     @Override
     public void onSuccess(AuthenticationResult authenticationResult) {
@@ -258,9 +157,7 @@ public class SignInActivity
     }
 
     private void start() {
-        //Intent appLaunch = new Intent(this, SnippetListActivity.class);
         Intent appLaunch = new Intent(this, SnippetDetailActivity.class);
-        //appLaunch.putExtra(SnippetDetailFragment.ARG_ITEM_ID, 34);
         startActivity(appLaunch);
     }
 
