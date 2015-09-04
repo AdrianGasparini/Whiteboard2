@@ -451,17 +451,20 @@ public class DetailFragment
         Cursor cursor = getActivity().getContentResolver().query(eventUri, new String[] { "title",
                         "dtstart", "dtend", "eventLocation" }, "(" + "dtstart" + "<=" + now + " and "
                         + "dtend" + ">=" + now + ")", null, "dtstart DESC");
-        try {
-            if(cursor.getCount() > 0) {
-                if (cursor.moveToNext()) {
-                    eventTitle = cursor.getString(0);
-                    eventDate = new SimpleDateFormat("yyyy-MM-dd HH.mm").format(new Date(Long.parseLong(cursor.getString(1))));
-                    eventLocation = cursor.getString(3);
-                    System.out.println("*** Event: " + eventTitle + " " + eventLocation + " " + eventDate);
+        if(cursor != null) {
+            try {
+                if (cursor.getCount() > 0) {
+                    if (cursor.moveToNext()) {
+                        eventTitle = cursor.getString(0);
+                        eventDate = new SimpleDateFormat("yyyy-MM-dd HH.mm").format(new Date(Long.parseLong(cursor.getString(1))));
+                        eventLocation = cursor.getString(3);
+                        System.out.println("*** Event: " + eventTitle + " " + eventLocation + " " + eventDate);
+                    }
                 }
+            } catch (AssertionError ex) {
+                System.out.println("*** Error reading calendar event cursor: " + ex);
             }
-        } catch (AssertionError ex) {
-            System.out.println("*** Error reading calendar event cursor: " + ex);
+            cursor.close();
         }
 
         String newSectionName = null;
@@ -749,7 +752,7 @@ public class DetailFragment
                     .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
         }
 
-        Notebook notebook = (Notebook) notebookMap.get(theSpinner.getSelectedItem().toString());
+        Notebook notebook = notebookMap.get(theSpinner.getSelectedItem().toString());
         System.out.println("*** Notebook id: " + notebook.id);
         mNotebookId = notebook.id;
 
@@ -774,7 +777,7 @@ public class DetailFragment
             preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
         }
 
-        Section section = (Section) sectionMap.get(mSpinner2.getSelectedItem().toString());
+        Section section = sectionMap.get(mSpinner2.getSelectedItem().toString());
         System.out.println("*** Section id: " + section.id);
         mSectionId = section.id;
 
@@ -1123,7 +1126,7 @@ public class DetailFragment
             @Override
             public void onError(Exception e) {
                 System.out.println("*** onError 2: " + e);
-                onError(e);
+                DetailFragment.this.onError(e);
             }
         });
     }
