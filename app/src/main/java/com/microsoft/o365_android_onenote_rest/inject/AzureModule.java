@@ -5,8 +5,8 @@ package com.microsoft.o365_android_onenote_rest.inject;
 
 import com.microsoft.AzureADModule;
 import com.microsoft.o365_android_onenote_rest.SignInActivity;
-import com.microsoft.o365_android_onenote_rest.SnippetDetailActivity;
-import com.microsoft.o365_android_onenote_rest.SnippetDetailFragment;
+import com.microsoft.o365_android_onenote_rest.DetailActivity;
+import com.microsoft.o365_android_onenote_rest.DetailFragment;
 
 import dagger.Module;
 
@@ -14,8 +14,8 @@ import dagger.Module;
         complete = false,
         injects = {
                 SignInActivity.class,
-                SnippetDetailActivity.class,
-                SnippetDetailFragment.class
+                DetailActivity.class,
+                DetailFragment.class
         }
 )
 public class AzureModule {

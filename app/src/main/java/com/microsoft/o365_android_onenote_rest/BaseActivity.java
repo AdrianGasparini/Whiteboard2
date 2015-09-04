@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 
 import com.microsoft.AzureADModule;
 import com.microsoft.AzureAppCompatActivity;
-import com.microsoft.live.LiveAuthClient;
 import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
@@ -17,16 +16,11 @@ import com.microsoft.o365_android_onenote_rest.inject.AzureModule;
 import com.microsoft.o365_android_onenote_rest.inject.ObjectGraphInjector;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
 
-import javax.inject.Inject;
-
 import dagger.ObjectGraph;
 
 public abstract class BaseActivity
         extends AzureAppCompatActivity
         implements ObjectGraphInjector {
-
-    @Inject
-    protected LiveAuthClient mLiveAuthClient;
 
     @Override
     protected AzureADModule getAzureADModule() {

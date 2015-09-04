@@ -1,39 +1,46 @@
 /*
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
-package com.microsoft.o365_android_onenote_rest.util;
+package com.microsoft.o365_android_onenote_rest;
 
-public class User {
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 
-    private static final String PREF_MSA = "PREF_MSA";
-    private static final String PREF_ORG = "PREF_ORG";
+import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 
-    static void isMsa(boolean msa) {
-        set(PREF_MSA, msa);
+public class DetailActivity extends BaseActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("*** DetailActivity.onCreate");
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_snippet_detail);
+        if (null != getSupportActionBar()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+        if (savedInstanceState == null) {
+            DetailFragment fragment = new DetailFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.snippet_detail_container, fragment)
+                    .commit();
+        }
     }
 
-    static void isOrg(boolean org) {
-        set(PREF_ORG, org);
-    }
+    public void onDisconnectClicked() {
+        finish();
 
-    public static boolean isMsa() {
-        return is(PREF_MSA);
-    }
+        mAuthenticationManagers.mAuthenticationManager1.disconnect();
+        mAuthenticationManagers.mAuthenticationManager2.disconnect();
 
-    public static boolean isOrg() {
-        return is(PREF_ORG);
-    }
-
-    private static boolean is(String which) {
-        return SharedPrefsUtil.getSharedPreferences().getBoolean(which, false);
-    }
-
-    private static void set(String which, boolean state) {
-        SharedPrefsUtil
-                .getSharedPreferences()
-                .edit()
-                .putBoolean(which, state)
-                .commit();
+        // drop the application shared preferences to clear any old auth tokens
+        getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE)
+                .edit() // get the editor
+                .clear() // clear it
+                .apply(); // asynchronously apply
+        Intent login = new Intent(this, SignInActivity.class);
+        login.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(login);
     }
 }
 // *********************************************************

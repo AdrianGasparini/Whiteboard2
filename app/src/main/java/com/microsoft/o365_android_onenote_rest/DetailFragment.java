@@ -41,24 +41,24 @@ import com.google.gson.JsonObject;
 import com.microsoft.AuthenticationManagers;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
-import com.microsoft.live.LiveAuthClient;
-import com.microsoft.live.LiveAuthException;
-import com.microsoft.live.LiveAuthListener;
-import com.microsoft.live.LiveConnectSession;
-import com.microsoft.live.LiveStatus;
 import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
-import com.microsoft.o365_android_onenote_rest.snippet.AbstractSnippet;
-import com.microsoft.o365_android_onenote_rest.snippet.Snippet;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
-import com.microsoft.o365_android_onenote_rest.util.User;
+import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.OneNotePartsMap;
+import com.microsoft.onenoteapi.service.PagesService;
 import com.microsoft.onenoteapi.service.PatchCommand;
+import com.microsoft.onenoteapi.service.SectionGroupsService;
+import com.microsoft.onenoteapi.service.SectionsService;
+import com.microsoft.onenoteapi.service.SiteMetadataService;
 import com.microsoft.onenotevos.Envelope;
 import com.microsoft.onenotevos.Notebook;
 import com.microsoft.onenotevos.Page;
 import com.microsoft.onenotevos.Section;
 import com.microsoft.onenotevos.SiteMetadata;
+import com.microsoft.sharepoint.service.SitesService;
+import com.microsoft.sharepointvos.FollowedSites;
+import com.microsoft.sharepointvos.Result;
 
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
@@ -72,8 +72,10 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -81,6 +83,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
+import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedFile;
@@ -102,14 +105,39 @@ import static com.microsoft.o365_android_onenote_rest.R.id.spinner0;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner;
 import static com.microsoft.o365_android_onenote_rest.R.id.spinner2;
 
-public class SnippetDetailFragment
+public class DetailFragment
         extends BaseFragment
         implements
-        AuthenticationCallback<AuthenticationResult>, LiveAuthListener, LocationListener {
+        AuthenticationCallback<AuthenticationResult>, LocationListener {
 
-    public static final String ARG_SPINNER_SELECTION = "SpinnerSelection";
-    public static final int UNSET = -1;
-    public static final String APP_STORE_URI = "https://play.google.com/store/apps/details?id=com.microsoft.office.onenote";
+    public static class Services {
+
+        public final NotebooksService mNotebooksService;
+        public final PagesService mPagesService;
+        public final SectionGroupsService mSectionGroupsService;
+        public final SectionsService mSectionsService;
+        public final SiteMetadataService mSiteMetadataService;
+        public final SitesService mSitesService;
+
+        Services() {
+            mNotebooksService = WhiteboardApp.getApp().getRestAdapter().create(NotebooksService.class);
+            mPagesService = WhiteboardApp.getApp().getRestAdapter().create(PagesService.class);
+            mSectionGroupsService = WhiteboardApp.getApp().getRestAdapter().create(SectionGroupsService.class);
+            mSectionsService = WhiteboardApp.getApp().getRestAdapter().create(SectionsService.class);
+            mSiteMetadataService = WhiteboardApp.getApp().getRestAdapter().create(SiteMetadataService.class);
+            mSitesService = WhiteboardApp.getApp().getRestAdapter2().create(SitesService.class);
+        }
+    }
+
+    public static final Services sServices = new Services();
+
+    private String mO365Version = "beta";
+
+    Map<String, Result> siteMap = new HashMap<>();
+    Map<String, Notebook> notebookMap = new HashMap<>();
+    Map<String, Section> sectionMap = new HashMap<>();
+    String mSiteCollectionId = null;
+    String mSiteId = null;
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int PICK_IMAGES = 2;
@@ -119,13 +147,15 @@ public class SnippetDetailFragment
     String mCurrentPhotoPath = null;
     File mPhotoFile = null;
     String mOneNoteClientUrl = null;
-    public static String sSiteName = null;
-    public static String sNotebookName = null;
-    public static String sSectionName = null;
-    public boolean mGotoDefault = false;
+    static String sSiteName = null;
+    static String sNotebookName = null;
+    static String sSectionName = null;
+    boolean mGotoDefault = false;
     LocationManager mLocationManager = null;
     String mLocationProvider = null;
     String mFinalAddress = null;
+
+    boolean setupDidRun = false;
 
     @InjectView(spinner0)
     protected Spinner mSpinner0;
@@ -163,13 +193,7 @@ public class SnippetDetailFragment
     @Inject
     public AuthenticationManagers mAuthenticationManagers;
 
-    @Inject
-    protected LiveAuthClient mLiveAuthClient;
-
-    boolean setupDidRun = false;
-    private Snippet mSnippet;
-
-    public SnippetDetailFragment() {
+    public DetailFragment() {
     }
 
     @OnClick(btn_run)
@@ -234,11 +258,11 @@ public class SnippetDetailFragment
 
             System.out.println("*** Invoking patchMultiPartPageSP");
             System.out.println("*** pageId: " + mPageId);
-            AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
+            sServices.mPagesService.patchMultiPartPageSP(
                     "",
-                    mSnippet.getVersion(),
-                    mSnippet.mSiteCollectionId,
-                    mSnippet.mSiteId,
+                    getVersion(),
+                    mSiteCollectionId,
+                    mSiteId,
                     mPageId,
                     oneNotePartsMap,
                     new retrofit.Callback<Envelope<Page>>() {
@@ -347,11 +371,11 @@ public class SnippetDetailFragment
 
                 System.out.println("*** Invoking patchMultiPartPageSP");
                 System.out.println("*** pageId: " + mPageId);
-                AbstractSnippet.sServices.mPagesService.patchMultiPartPageSP(
+                sServices.mPagesService.patchMultiPartPageSP(
                         "",
-                        mSnippet.getVersion(),
-                        mSnippet.mSiteCollectionId,
-                        mSnippet.mSiteId,
+                        getVersion(),
+                        mSiteCollectionId,
+                        mSiteId,
                         mPageId,
                         oneNotePartsMap,
                         new retrofit.Callback<Envelope<Page>>() {
@@ -384,7 +408,6 @@ public class SnippetDetailFragment
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
@@ -480,10 +503,10 @@ public class SnippetDetailFragment
                 final String sectionName = input.getText().toString();
                 System.out.println("*** New section name: " + sectionName);
 
-                AbstractSnippet.sServices.mSectionsService.postSectionSP(
-                        mSnippet.getVersion(),
-                        mSnippet.mSiteCollectionId,
-                        mSnippet.mSiteId,
+                sServices.mSectionsService.postSectionSP(
+                        getVersion(),
+                        mSiteCollectionId,
+                        mSiteId,
                         "application/json",
                         mNotebookId,
                         createNewSection(sectionName),
@@ -510,11 +533,11 @@ public class SnippetDetailFragment
                                     }
                                 };
 
-                                AbstractSnippet.sServices.mPagesService.postPagesSP(
+                                sServices.mPagesService.postPagesSP(
                                         "text/html; encoding=utf8",
-                                        mSnippet.getVersion(),
-                                        mSnippet.mSiteCollectionId,
-                                        mSnippet.mSiteId,
+                                        getVersion(),
+                                        mSiteCollectionId,
+                                        mSiteId,
                                         mSectionId,
                                         presentationString,
                                         new retrofit.Callback<Page>() {
@@ -529,7 +552,7 @@ public class SnippetDetailFragment
                                                 mOpenOneNoteButton.setEnabled(true);
 
                                                 System.out.println("*** Fetching sections");
-                                                mSnippet.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback3(sectionName), mSnippet.sectionMap, mNotebookId);
+                                                fillSectionSpinner(sServices.mSectionsService, getSetUpCallback3(sectionName), sectionMap, mNotebookId);
                                             }
 
                                             @Override
@@ -549,7 +572,6 @@ public class SnippetDetailFragment
                             public void failure(RetrofitError error) {
                                 System.out.println("*** postSection failure");
                                 if (isAdded()) {
-                                    //displayThrowable(error.getCause());
                                     displayThrowable(error);
                                     mProgressbar.setVisibility(View.GONE);
                                     mRunButton.setEnabled(true);
@@ -610,7 +632,7 @@ public class SnippetDetailFragment
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mGotoDefault = false;
-        mSnippet.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+        setUp(getSetUpCallback0());
     }
 
     @OnClick(btn_pick_photos)
@@ -658,7 +680,7 @@ public class SnippetDetailFragment
         mSpinner.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mGotoDefault = true;
-        mSnippet.setUp(AbstractSnippet.sServices, getSetUpCallback0());
+        setUp(getSetUpCallback0());
     }
 
     @OnItemSelected(spinner0)
@@ -681,23 +703,23 @@ public class SnippetDetailFragment
                     .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
         }
 
-        com.microsoft.sharepointvos.Result result = (com.microsoft.sharepointvos.Result) mSnippet.siteMap.get(
+        com.microsoft.sharepointvos.Result result = siteMap.get(
                 theSpinner.getSelectedItem().toString());
         System.out.println("*** Site URI: " + result.getUri());
         String siteUri = result.getUri().toString();
 
         System.out.println("*** Async invocation of SiteMetadataService");
-        AbstractSnippet.sServices.mSiteMetadataService.getSiteMetadata(
-                mSnippet.getVersion(),
+        sServices.mSiteMetadataService.getSiteMetadata(
+                getVersion(),
                 siteUri,
                 new retrofit.Callback<SiteMetadata>() {
                     @Override
                     public void success(SiteMetadata siteMetadata, Response response) {
                         System.out.println("*** Received site metadata");
                         System.out.println("*** Site Collection ID and Site ID: " + siteMetadata.siteCollectionId + " " + siteMetadata.siteId);
-                        mSnippet.mSiteCollectionId = siteMetadata.siteCollectionId;
-                        mSnippet.mSiteId = siteMetadata.siteId;
-                        mSnippet.fillNotebookSpinner(AbstractSnippet.sServices.mNotebooksService, getSetUpCallback(), mSnippet.notebookMap);
+                        mSiteCollectionId = siteMetadata.siteCollectionId;
+                        mSiteId = siteMetadata.siteId;
+                        fillNotebookSpinner(sServices.mNotebooksService, getSetUpCallback(), notebookMap);
                     }
 
                     @Override
@@ -727,11 +749,11 @@ public class SnippetDetailFragment
                     .putString(SharedPrefsUtil.PREF_SECTION, null).commit();
         }
 
-        Notebook notebook = (Notebook) mSnippet.notebookMap.get(theSpinner.getSelectedItem().toString());
+        Notebook notebook = (Notebook) notebookMap.get(theSpinner.getSelectedItem().toString());
         System.out.println("*** Notebook id: " + notebook.id);
         mNotebookId = notebook.id;
 
-        mSnippet.fillSectionSpinner(AbstractSnippet.sServices.mSectionsService, getSetUpCallback2(), mSnippet.sectionMap, notebook.id);
+        fillSectionSpinner(sServices.mSectionsService, getSetUpCallback2(), sectionMap, notebook.id);
 
         mSetDefaultButton.setEnabled(true);
         mNewSectionButton.setEnabled(true);
@@ -752,14 +774,14 @@ public class SnippetDetailFragment
             preferences.edit().putString(SharedPrefsUtil.PREF_SECTION, theSpinner.getSelectedItem().toString()).commit();
         }
 
-        Section section = (Section) mSnippet.sectionMap.get(mSpinner2.getSelectedItem().toString());
+        Section section = (Section) sectionMap.get(mSpinner2.getSelectedItem().toString());
         System.out.println("*** Section id: " + section.id);
         mSectionId = section.id;
 
-        AbstractSnippet.sServices.mPagesService.getSectionPagesSP(
-                mSnippet.getVersion(),
-                mSnippet.mSiteCollectionId,
-                mSnippet.mSiteId,
+        sServices.mPagesService.getSectionPagesSP(
+                getVersion(),
+                mSiteCollectionId,
+                mSiteId,
                 mSectionId,
                 "createdTime asc",
                 null,
@@ -800,17 +822,6 @@ public class SnippetDetailFragment
 
         setHasOptionsMenu(true);
 
-        SharedPreferences preferences
-                = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
-        sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
-        sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
-        sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
-        System.out.println("*** Site: " + sSiteName);
-        System.out.println("*** Notebook: " + sNotebookName);
-        System.out.println("*** Section: " + sSectionName);
-
-        mSnippet = new Snippet();
-
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
@@ -845,21 +856,7 @@ public class SnippetDetailFragment
         super.onResume();
         mLocationManager.requestLocationUpdates(mLocationProvider, 60000, 100.0f, this);
 
-        if (User.isOrg()) {
-            mAuthenticationManagers.mAuthenticationManager1.connect(this);
-            mAuthenticationManagers.mAuthenticationManager2.connect(new AuthenticationCallback<AuthenticationResult>() {
-                @Override
-                public void onSuccess(AuthenticationResult authenticationResult) {
-                    SharedPrefsUtil.persistAuthToken2(authenticationResult);
-                    ready();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    System.out.println("*** onError: " + e);
-                }
-            });
-        }
+        mAuthenticationManagers.mAuthenticationManager1.connect(this);
     }
 
     @Override
@@ -911,7 +908,7 @@ public class SnippetDetailFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.disconnect == item.getItemId()) {
-            ((SnippetDetailActivity)getActivity()).onDisconnectClicked();
+            ((DetailActivity)getActivity()).onDisconnectClicked();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -1113,8 +1110,22 @@ public class SnippetDetailFragment
 
     @Override
     public void onSuccess(AuthenticationResult authenticationResult) {
+        System.out.println("*** onSuccess");
         SharedPrefsUtil.persistAuthToken(authenticationResult);
-        ready();
+        mAuthenticationManagers.mAuthenticationManager2.connect(new AuthenticationCallback<AuthenticationResult>() {
+            @Override
+            public void onSuccess(AuthenticationResult authenticationResult) {
+                System.out.println("*** onSuccess 2");
+                SharedPrefsUtil.persistAuthToken2(authenticationResult);
+                ready();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                System.out.println("*** onError 2: " + e);
+                onError(e);
+            }
+        });
     }
 
     private void ready() {
@@ -1124,24 +1135,33 @@ public class SnippetDetailFragment
             mSpinner0.setVisibility(View.INVISIBLE);
             mSpinner.setVisibility(View.INVISIBLE);
             mSpinner2.setVisibility(View.INVISIBLE);
-            mSnippet.setUp(AbstractSnippet.sServices, getSetUpCallback0());
 
             SharedPreferences preferences
                     = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
+            sSiteName = preferences.getString(SharedPrefsUtil.PREF_SITE, null);
+            sNotebookName = preferences.getString(SharedPrefsUtil.PREF_NOTEBOOK, null);
+            sSectionName = preferences.getString(SharedPrefsUtil.PREF_SECTION, null);
+            System.out.println("*** Site: " + sSiteName);
+            System.out.println("*** Notebook: " + sNotebookName);
+            System.out.println("*** Section: " + sSectionName);
+
             mGotoDefaultButton.setEnabled(preferences.getString(SharedPrefsUtil.PREF_DEFAULT_SITE, null) != null &&
                     preferences.getString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, null) != null);
+
+            setUp(getSetUpCallback0());
         }
     }
 
     @Override
     public void onError(Exception e) {
+        System.out.println("*** onError: " + e);
         if (!isAdded()) {
             return;
         }
         displayThrowable(e);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.token_err_title)
-                .setMessage(R.string.token_err_msg)
+                .setMessage(e.getMessage())
                 .setPositiveButton(R.string.dismiss, null)
                 .setNegativeButton(R.string.disconnect, new DialogInterface.OnClickListener() {
                     @Override
@@ -1152,18 +1172,128 @@ public class SnippetDetailFragment
                 }).show();
     }
 
-    @Override
-    public void onAuthComplete(LiveStatus status, LiveConnectSession session, Object userState) {
-        if (null != session) {
-            SharedPrefsUtil.persistAuthToken(session);
-        }
-        ready();
+    /**
+     * Returns the version segment of the endpoint url (Office 365, MSA)
+     *
+     * @return the version of the endpoint to use
+     */
+    public String getVersion() {
+        return mO365Version;
     }
 
-    @Override
-    public void onAuthError(LiveAuthException exception, Object userState) {
-        onError(exception);
+    public void setUp(final retrofit.Callback<String[]> callback) {
+        fillSiteSpinner(sServices.mSitesService, callback, siteMap);
     }
+
+    protected void fillSiteSpinner(
+            SitesService sitesService,
+            final retrofit.Callback<String[]> callback,
+            final Map<String, com.microsoft.sharepointvos.Result> sitesMap) {
+        System.out.println("*** fillSiteSpinner");
+        sitesService.getFollowedSites(
+                new Callback<FollowedSites>() {
+
+                    @Override
+                    public void success(FollowedSites followedSites, Response response) {
+                        System.out.println("*** fillSiteSpinner success");
+                        List<com.microsoft.sharepointvos.Result> resultList = followedSites.getD().getFollowed().getResults();
+                        String[] siteNames = new String[resultList.size()];
+                        for (int i = 0; i < resultList.size(); i++) {
+                            siteNames[i] = resultList.get(i).getName();
+                            sitesMap.put(resultList.get(i).getName(), resultList.get(i));
+                            System.out.println("*** Site: " + siteNames[i]);
+                        }
+                        callback.success(siteNames, response);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** fillSiteSpinner failure");
+                        callback.failure(error);
+                    }
+
+                });
+    }
+
+    public void fillNotebookSpinner(
+            NotebooksService notebooksService,
+            final retrofit.Callback<String[]> callback,
+            final Map<String, Notebook> notebookMap) {
+        System.out.println("*** fillNotebookSpinner");
+        notebooksService.getNotebooksSP(getVersion(),
+                mSiteCollectionId,
+                mSiteId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                new Callback<Envelope<Notebook>>() {
+
+                    @Override
+                    public void success(Envelope<Notebook> notebookEnvelope, Response response) {
+                        Notebook[] notebooks = notebookEnvelope.value;
+                        String[] bookNames = new String[notebooks.length];
+                        for (int i = 0; i < notebooks.length; i++) {
+                            bookNames[i] = notebooks[i].name;
+                            notebookMap.put(notebooks[i].name, notebooks[i]);
+                        }
+                        callback.success(bookNames, response);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** fillNotebookSpinner failure");
+                        callback.failure(error);
+                    }
+
+                });
+    }
+
+    public void fillSectionSpinner(
+            SectionsService sectionsService,
+            final retrofit.Callback<String[]> callback,
+            final Map<String, Section> sectionMap,
+            String notebookId) {
+        System.out.println("*** fillSectionSpinner");
+
+        sectionsService.getNotebookSectionsSP(
+                getVersion(),
+                mSiteCollectionId,
+                mSiteId,
+                notebookId,
+                null,
+                "createdTime desc",
+                null,
+                null,
+                null,
+                null,
+                new Callback<Envelope<Section>>() {
+
+                    @Override
+                    public void success(Envelope<Section> envelope, Response response) {
+                        System.out.println("*** fillSectionSpinner success");
+                        Section[] sections = envelope.value;
+                        String[] sectionNames = new String[sections.length];
+                        for (int i = 0; i < sections.length; i++) {
+                            sectionNames[i] = sections[i].name;
+                            sectionMap.put(sections[i].name, sections[i]);
+                            System.out.println("*** Section: " + sectionNames[i]);
+                        }
+                        callback.success(sectionNames, response);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("*** fillSectionSpinner failure");
+                        sectionMap.clear();
+                        callback.failure(error);
+                    }
+
+                });
+    }
+
 }
 // *********************************************************
 //

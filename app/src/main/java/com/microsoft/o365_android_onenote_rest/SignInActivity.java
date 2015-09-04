@@ -23,7 +23,6 @@ import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
 import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
 import com.microsoft.o365_android_onenote_rest.inject.AppModule;
 import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
-import com.microsoft.o365_android_onenote_rest.util.User;
 
 import java.net.URI;
 import java.util.UUID;
@@ -36,7 +35,7 @@ import static com.microsoft.o365_android_onenote_rest.R.id.o365_signin;
 
 public class SignInActivity
         extends BaseActivity
-        implements AuthenticationCallback<AuthenticationResult>, LiveAuthListener {
+        implements AuthenticationCallback<AuthenticationResult> {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -50,10 +49,7 @@ public class SignInActivity
         doIt = true;
         setContentView(R.layout.activity_signin);
 
-        if (User.isOrg()) {
-            mAuthenticationManagers.mAuthenticationManager1.connect(this);
-            mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-        }
+        mAuthenticationManagers.mAuthenticationManager1.connect(this);
         ButterKnife.inject(this);
 
     }
@@ -103,45 +99,10 @@ public class SignInActivity
                 .show();
     }
 
-    AuthenticationCallback<AuthenticationResult> getAuthenticationCallback() {
-        return new AuthenticationCallback<AuthenticationResult>() {
-            @Override
-            public void onSuccess(AuthenticationResult authenticationResult) {
-                finish();
-                SharedPrefsUtil.persistAuthToken2(authenticationResult);
-                start();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                System.out.println("*** SignInActivity onError: " + e);
-            }
-        };
-    }
-
     private void authenticateOrganization() throws IllegalArgumentException {
         validateOrganizationArgs();
-        if (!User.isOrg()) {
-            mLiveAuthClient.logout(new LiveAuthListener() {
-                @Override
-                public void onAuthComplete(LiveStatus status,
-                                           LiveConnectSession session,
-                                           Object userState) {
-                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
-                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-                }
-
-                @Override
-                public void onAuthError(LiveAuthException exception, Object userState) {
-                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
-                    mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-                }
-            });
-        } else {
-            System.out.println("*** SignInActivity.authenticateOrganization");
-            mAuthenticationManagers.mAuthenticationManager1.connect(this);
-            mAuthenticationManagers.mAuthenticationManager2.connect(getAuthenticationCallback());
-        }
+        System.out.println("*** SignInActivity.authenticateOrganization");
+         mAuthenticationManagers.mAuthenticationManager1.connect(this);
     }
 
     private void validateOrganizationArgs() throws IllegalArgumentException {
@@ -150,14 +111,26 @@ public class SignInActivity
     }
 
     @Override
-    public void onSuccess(AuthenticationResult authenticationResult) {
-        finish();
-        SharedPrefsUtil.persistAuthToken(authenticationResult);
-        start();
+    public void onSuccess(final AuthenticationResult authenticationResult) {
+        mAuthenticationManagers.mAuthenticationManager2.connect(new AuthenticationCallback<AuthenticationResult>() {
+            @Override
+            public void onSuccess(AuthenticationResult authenticationResult2) {
+                finish();
+                SharedPrefsUtil.persistAuthToken(authenticationResult);
+                SharedPrefsUtil.persistAuthToken2(authenticationResult2);
+                start();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                System.out.println("*** SignInActivity onError: " + e);
+                onError(e);
+            }
+        });
     }
 
     private void start() {
-        Intent appLaunch = new Intent(this, SnippetDetailActivity.class);
+        Intent appLaunch = new Intent(this, DetailActivity.class);
         startActivity(appLaunch);
     }
 
@@ -166,28 +139,6 @@ public class SignInActivity
         e.printStackTrace();
     }
 
-    @Override
-    public void onAuthComplete(LiveStatus status,
-                               LiveConnectSession session,
-                               Object userState) {
-        Timber.d("MSA: Auth Complete...");
-        if (null != status) {
-            Timber.d(status.toString());
-        }
-        if (null != session) {
-            Timber.d(session.toString());
-            SharedPrefsUtil.persistAuthToken(session);
-        }
-        if (null != userState) {
-            Timber.d(userState.toString());
-        }
-        start();
-    }
-
-    @Override
-    public void onAuthError(LiveAuthException exception, Object userState) {
-        exception.printStackTrace();
-    }
 }
 // *********************************************************
 //

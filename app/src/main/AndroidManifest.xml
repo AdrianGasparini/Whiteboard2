@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SnippetDetailActivity"
+            android:name=".DetailActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_snippet_detail"
             android:parentActivityName=".SignInActivity">

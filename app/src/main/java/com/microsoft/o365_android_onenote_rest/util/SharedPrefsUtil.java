@@ -28,22 +28,14 @@ public class SharedPrefsUtil {
 
     public static void persistAuthToken(AuthenticationResult result) {
         setAccessToken(result.getAccessToken());
-        User.isOrg(true);
-    }
-
-    public static void persistAuthToken(LiveConnectSession session) {
-        setAccessToken(session.getAccessToken());
-        User.isMsa(true);
     }
 
     private static void setAccessToken(String accessToken) {
         getSharedPreferences().edit().putString(PREF_AUTH_TOKEN, accessToken).commit();
     }
 
-
     public static void persistAuthToken2(AuthenticationResult result) {
         setAccessToken2(result.getAccessToken());
-        User.isOrg(true);
     }
 
     private static void setAccessToken2(String accessToken) {
