@@ -15,7 +15,7 @@ public class DetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("*** DetailActivity.onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_snippet_detail);
+        setContentView(R.layout.activity_detail);
         if (null != getSupportActionBar()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
