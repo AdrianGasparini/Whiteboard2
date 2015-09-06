@@ -2,16 +2,16 @@
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
 
-package com.microsoft.o365_android_onenote_rest.application;
+package ch.fcpkag.whiteboard.application;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.microsoft.o365_android_onenote_rest.BuildConfig;
-import com.microsoft.o365_android_onenote_rest.inject.AppModule;
-import com.microsoft.o365_android_onenote_rest.inject.RequestInterceptors;
-import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
+import ch.fcpkag.whiteboard.inject.RequestInterceptors;
+import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
+import ch.fcpkag.whiteboard.BuildConfig;
+import ch.fcpkag.whiteboard.inject.AppModule;
 
 import javax.inject.Inject;
 

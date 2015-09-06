@@ -130,7 +130,6 @@ public class AzureADModule {
         AuthenticationManagers ms = new AuthenticationManagers();
         ms.mAuthenticationManager1 = new AuthenticationManager(
                 mBuilder.mActivity,
-                //authenticationContext,
                 authenticationContexts.mAuthenticationContext1,
                 mBuilder.mAuthenticationResourceId1,
                 mBuilder.mSharedPreferencesFilename,
@@ -138,7 +137,6 @@ public class AzureADModule {
                 mBuilder.mRedirectUri);
         ms.mAuthenticationManager2 = new AuthenticationManager(
                 mBuilder.mActivity,
-                //authenticationContext,
                 authenticationContexts.mAuthenticationContext2,
                 mBuilder.mAuthenticationResourceId2,
                 mBuilder.mSharedPreferencesFilename,

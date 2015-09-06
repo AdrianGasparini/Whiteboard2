@@ -2,7 +2,7 @@
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
 
-package com.microsoft.o365_android_onenote_rest;
+package ch.fcpkag.whiteboard;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

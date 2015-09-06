@@ -1,24 +1,46 @@
 /*
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
-package com.microsoft.o365_android_onenote_rest.inject;
+package ch.fcpkag.whiteboard;
 
-import com.microsoft.AzureADModule;
-import com.microsoft.o365_android_onenote_rest.SignInActivity;
-import com.microsoft.o365_android_onenote_rest.DetailActivity;
-import com.microsoft.o365_android_onenote_rest.DetailFragment;
+import android.content.Intent;
+import android.os.Bundle;
 
-import dagger.Module;
+import ch.fcpkag.whiteboard.inject.AppModule;
 
-@Module(includes = AzureADModule.class,
-        complete = false,
-        injects = {
-                SignInActivity.class,
-                DetailActivity.class,
-                DetailFragment.class
+public class DetailActivity extends BaseActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("*** DetailActivity.onCreate");
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detail);
+        if (null != getSupportActionBar()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
-)
-public class AzureModule {
+        if (savedInstanceState == null) {
+            DetailFragment fragment = new DetailFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.snippet_detail_container, fragment)
+                    .commit();
+        }
+    }
+
+    public void onDisconnectClicked() {
+        finish();
+
+        mAuthenticationManagers.mAuthenticationManager1.disconnect();
+        mAuthenticationManagers.mAuthenticationManager2.disconnect();
+
+        // drop the application shared preferences to clear any old auth tokens
+        getSharedPreferences(AppModule.PREFS, MODE_PRIVATE)
+                .edit() // get the editor
+                .clear() // clear it
+                .apply(); // asynchronously apply
+        Intent login = new Intent(this, SignInActivity.class);
+        login.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(login);
+    }
 }
 // *********************************************************
 //

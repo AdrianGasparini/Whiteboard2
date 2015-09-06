@@ -1,4 +1,4 @@
-package com.microsoft.o365_android_onenote_rest.inject;
+package ch.fcpkag.whiteboard.inject;
 
 import retrofit.RequestInterceptor;
 

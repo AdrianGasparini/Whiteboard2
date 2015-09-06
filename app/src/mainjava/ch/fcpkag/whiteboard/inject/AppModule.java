@@ -2,18 +2,16 @@
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
 
-package com.microsoft.o365_android_onenote_rest.inject;
+package ch.fcpkag.whiteboard.inject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.microsoft.live.LiveAuthClient;
-import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
-import com.microsoft.o365_android_onenote_rest.conf.ServiceConstants;
-import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
-import com.microsoft.onenoteapi.service.GsonDateTime;
+import ch.fcpkag.whiteboard.application.WhiteboardApp;
+import ch.fcpkag.whiteboard.conf.ServiceConstants;
+import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
 
-import javax.inject.Singleton;
+import com.microsoft.onenoteapi.service.GsonDateTime;
 
 import dagger.Module;
 import dagger.Provides;
@@ -29,7 +27,7 @@ import retrofit.converter.GsonConverter;
 )
 public class AppModule {
 
-    public static final String PREFS = "com.microsoft.o365_android_onenote_rest";
+    public static final String PREFS = "ch.fcpkag.whiteboard";
 
     @Provides
     public String providesRestEndpoint() {
@@ -82,11 +80,6 @@ public class AppModule {
         return is;
     }
 
-    @Provides
-    @Singleton
-    public LiveAuthClient providesLiveAuthClient() {
-        return new LiveAuthClient(WhiteboardApp.getApp(), ServiceConstants.MSA_CLIENT_ID);
-    }
 }
 // *********************************************************
 //

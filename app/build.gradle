@@ -4,7 +4,7 @@ android {
     compileSdkVersion 21
     buildToolsVersion '21.1.1'
     defaultConfig {
-        applicationId "com.microsoft.o365_android_onenote_rest"
+        applicationId "ch.fcpkag.whiteboard"
         minSdkVersion 18
         targetSdkVersion 21
         versionCode 1

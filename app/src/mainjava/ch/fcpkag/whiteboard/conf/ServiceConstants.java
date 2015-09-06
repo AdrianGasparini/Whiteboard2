@@ -1,10 +1,8 @@
-package com.microsoft.o365_android_onenote_rest.conf;
+package ch.fcpkag.whiteboard.conf;
 
 public class ServiceConstants {
-
-    // MSA
-    public static final String MSA_CLIENT_ID = "0000000044158D27";
     public static final String ONENOTE_API = "https://www.onenote.com/api";
+
     // Org
     public static final String AUTHENTICATION_RESOURCE_ID = "https://onenote.com";
     public static final String AUTHENTICATION_RESOURCE_ID2 = "https://fcpkag.sharepoint.com";

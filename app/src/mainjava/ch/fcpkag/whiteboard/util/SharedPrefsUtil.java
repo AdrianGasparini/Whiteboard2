@@ -1,46 +1,44 @@
 /*
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
-package com.microsoft.o365_android_onenote_rest;
+package ch.fcpkag.whiteboard.util;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
+import android.content.SharedPreferences;
 
-import com.microsoft.o365_android_onenote_rest.inject.AppModule;
+import com.microsoft.aad.adal.AuthenticationResult;
+import ch.fcpkag.whiteboard.application.WhiteboardApp;
+import ch.fcpkag.whiteboard.inject.AppModule;
 
-public class DetailActivity extends BaseActivity {
+public class SharedPrefsUtil {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        System.out.println("*** DetailActivity.onCreate");
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-        if (null != getSupportActionBar()) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        }
-        if (savedInstanceState == null) {
-            DetailFragment fragment = new DetailFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.snippet_detail_container, fragment)
-                    .commit();
-        }
+    public static final String PREF_AUTH_TOKEN = "PREF_AUTH_TOKEN";
+    public static final String PREF_AUTH_TOKEN2 = "PREF_AUTH_TOKEN2";
+    public static final String PREF_SHAREPOINT_URL = "PREF_SHAREPOINT_URL";
+    public static final String PREF_SITE = "PREF_SITE";
+    public static final String PREF_NOTEBOOK = "PREF_NOTEBOOK";
+    public static final String PREF_SECTION = "PREF_SECTION";
+    public static final String PREF_DEFAULT_SITE = "PREF_DEFAULT_SITE";
+    public static final String PREF_DEFAULT_NOTEBOOK = "PREF_DEFAULT_NOTEBOOK";
+
+    public static SharedPreferences getSharedPreferences() {
+        return WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
     }
 
-    public void onDisconnectClicked() {
-        finish();
+    public static void persistAuthToken(AuthenticationResult result) {
+        setAccessToken(result.getAccessToken());
+    }
 
-        mAuthenticationManagers.mAuthenticationManager1.disconnect();
-        mAuthenticationManagers.mAuthenticationManager2.disconnect();
+    private static void setAccessToken(String accessToken) {
+        getSharedPreferences().edit().putString(PREF_AUTH_TOKEN, accessToken).commit();
+    }
 
-        // drop the application shared preferences to clear any old auth tokens
-        getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE)
-                .edit() // get the editor
-                .clear() // clear it
-                .apply(); // asynchronously apply
-        Intent login = new Intent(this, SignInActivity.class);
-        login.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(login);
+    public static void persistAuthToken2(AuthenticationResult result) {
+        setAccessToken2(result.getAccessToken());
+    }
+
+    private static void setAccessToken2(String accessToken) {
+        getSharedPreferences().edit().putString(PREF_AUTH_TOKEN2, accessToken).commit();
     }
 }
 // *********************************************************

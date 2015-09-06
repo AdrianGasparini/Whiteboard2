@@ -1,7 +1,7 @@
 /*
 *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
 */
-package com.microsoft.o365_android_onenote_rest;
+package ch.fcpkag.whiteboard;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,9 +41,10 @@ import com.google.gson.JsonObject;
 import com.microsoft.AuthenticationManagers;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
-import com.microsoft.o365_android_onenote_rest.application.WhiteboardApp;
-import com.microsoft.o365_android_onenote_rest.inject.AppModule;
-import com.microsoft.o365_android_onenote_rest.util.SharedPrefsUtil;
+import ch.fcpkag.whiteboard.R;
+import ch.fcpkag.whiteboard.application.WhiteboardApp;
+import ch.fcpkag.whiteboard.inject.AppModule;
+import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
 import com.microsoft.onenoteapi.service.NotebooksService;
 import com.microsoft.onenoteapi.service.OneNotePartsMap;
 import com.microsoft.onenoteapi.service.PagesService;
@@ -93,17 +94,17 @@ import timber.log.Timber;
 import static android.R.layout.simple_spinner_dropdown_item;
 import static android.R.layout.simple_spinner_item;
 import static android.view.View.VISIBLE;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_set_default;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_goto_default;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_pick_photos;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_refresh;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_open_onenote;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_new_section;
-import static com.microsoft.o365_android_onenote_rest.R.id.btn_run;
-import static com.microsoft.o365_android_onenote_rest.R.id.progressbar;
-import static com.microsoft.o365_android_onenote_rest.R.id.spinner0;
-import static com.microsoft.o365_android_onenote_rest.R.id.spinner;
-import static com.microsoft.o365_android_onenote_rest.R.id.spinner2;
+import static ch.fcpkag.whiteboard.R.id.btn_set_default;
+import static ch.fcpkag.whiteboard.R.id.btn_goto_default;
+import static ch.fcpkag.whiteboard.R.id.btn_pick_photos;
+import static ch.fcpkag.whiteboard.R.id.btn_refresh;
+import static ch.fcpkag.whiteboard.R.id.btn_open_onenote;
+import static ch.fcpkag.whiteboard.R.id.btn_new_section;
+import static ch.fcpkag.whiteboard.R.id.btn_run;
+import static ch.fcpkag.whiteboard.R.id.progressbar;
+import static ch.fcpkag.whiteboard.R.id.spinner0;
+import static ch.fcpkag.whiteboard.R.id.spinner;
+import static ch.fcpkag.whiteboard.R.id.spinner2;
 
 public class DetailFragment
         extends BaseFragment
