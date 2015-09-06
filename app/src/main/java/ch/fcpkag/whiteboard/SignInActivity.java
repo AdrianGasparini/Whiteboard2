@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
@@ -19,13 +18,7 @@ import ch.fcpkag.whiteboard.conf.ServiceConstants;
 import ch.fcpkag.whiteboard.inject.AppModule;
 import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
 
-import java.net.URI;
-import java.util.UUID;
-
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static ch.fcpkag.whiteboard.R.id.o365_signin;
 
 public class SignInActivity
         extends BaseActivity
@@ -38,9 +31,9 @@ public class SignInActivity
         SharedPreferences preferences
                 = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, MODE_PRIVATE);
         String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
-        doIt = (sharePointUrl != null);
+        doInject = (sharePointUrl != null);
         super.onCreate(savedInstanceState);
-        doIt = true;
+        doInject = true;
         setContentView(R.layout.activity_signin);
 
         if(sharePointUrl == null) {
@@ -64,14 +57,9 @@ public class SignInActivity
                     SharedPreferences preferences
                             = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, MODE_PRIVATE);
                     preferences.edit().putString(SharedPrefsUtil.PREF_SHAREPOINT_URL, sharePointUrl).commit();
-                    try {
-                        doIt();
-                        //authenticateOrganization();
-                        mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
-                        ButterKnife.inject(SignInActivity.this);
-                    } catch (IllegalArgumentException e) {
-                        warnBadClient();
-                    }
+                    doInject();
+                    mAuthenticationManagers.mAuthenticationManager1.connect(SignInActivity.this);
+                    ButterKnife.inject(SignInActivity.this);
                 }
             });
             builder.show();
@@ -81,66 +69,6 @@ public class SignInActivity
             ButterKnife.inject(this);
         }
     }
-
-/*
-    @OnClick(o365_signin)
-    public void onSignInO365Clicked() {
-        System.out.println("*** onSignInO365Clicked");
-
-        SharedPreferences preferences
-                = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, MODE_PRIVATE);
-        String sharePointUrl = preferences.getString(SharedPrefsUtil.PREF_SHAREPOINT_URL, null);
-        if(sharePointUrl == null) sharePointUrl = ServiceConstants.AUTHENTICATION_RESOURCE_ID2;
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.sharepoint_url);
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setText(sharePointUrl);
-        input.selectAll();
-        builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String sharePointUrl = input.getText().toString();
-                System.out.println("*** SharePoint URL: " + sharePointUrl);
-                if (sharePointUrl.equals(""))
-                    sharePointUrl = ServiceConstants.AUTHENTICATION_RESOURCE_ID2;  // default URL
-                System.out.println("*** SharePoint URL: " + sharePointUrl);
-                SharedPreferences preferences
-                        = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, MODE_PRIVATE);
-                preferences.edit().putString(SharedPrefsUtil.PREF_SHAREPOINT_URL, sharePointUrl).commit();
-                try {
-                    doIt();
-                    authenticateOrganization();
-                } catch (IllegalArgumentException e) {
-                    warnBadClient();
-                }
-            }
-        });
-        builder.show();
-    }
-*/
-
-    private void warnBadClient() {
-        Toast.makeText(this,
-                R.string.warning_clientid_redirecturi_incorrect,
-                Toast.LENGTH_LONG)
-                .show();
-    }
-
-/*
-    private void authenticateOrganization() throws IllegalArgumentException {
-        validateOrganizationArgs();
-        System.out.println("*** SignInActivity.authenticateOrganization");
-        mAuthenticationManagers.mAuthenticationManager1.connect(this);
-    }
-
-    private void validateOrganizationArgs() throws IllegalArgumentException {
-        UUID.fromString(ServiceConstants.CLIENT_ID);
-        URI.create(ServiceConstants.REDIRECT_URI);
-    }
-*/
 
     @Override
     public void onSuccess(final AuthenticationResult authenticationResult) {

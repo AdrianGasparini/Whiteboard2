@@ -26,5 +26,4 @@
     <string name="section_without_page_msg">Section without page. Please select a section with a page or create a new section.</string>
     <string name="section_created_msg">Section created.</string>
     <string name="set_default_msg">Selected site and notebook set as default.</string>
-    <string name="warning_clientid_redirecturi_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the ServiceConstants.java file and run again</string>
 </resources>

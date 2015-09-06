@@ -21,35 +21,19 @@ public abstract class AzureAppCompatActivity extends AppCompatActivity {
     @Inject
     protected AuthenticationContexts mAuthenticationContexts;
 
-    public boolean doIt = true;
+    public boolean doInject = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("*** AzureAppCompatActivity.onCreate: " + this.getClass().getName());
         super.onCreate(savedInstanceState);
 
-        if(doIt) {
-            Object[] modules = new Object[getModules().length + 1];
-            int ii = 0;
-            modules[ii++] = getAzureADModule();
-            for (Object module : getModules()) {
-                modules[ii++] = module;
-            }
-
-            mObjectGraph = getRootGraph();
-            if (null == mObjectGraph) {
-                // create a new one
-                mObjectGraph = ObjectGraph.create(modules);
-            } else {
-                // extend the existing one
-                mObjectGraph = mObjectGraph.plus(modules);
-            }
-
-            mObjectGraph.inject(this);
+        if(doInject) {
+            doInject();
         }
     }
 
-    public void doIt() {
+    public void doInject() {
         Object[] modules = new Object[getModules().length + 1];
         int ii = 0;
         modules[ii++] = getAzureADModule();
