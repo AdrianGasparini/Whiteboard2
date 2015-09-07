@@ -31,7 +31,7 @@ public abstract class BaseActivity
         AzureADModule.Builder builder = new AzureADModule.Builder(this);
         builder.validateAuthority(true)
                 .skipBroker(true)
-                .authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID, sharePointUrl)
+                .authenticationResourceId(ServiceConstants.AUTHENTICATION_RESOURCE_ID1, sharePointUrl)
                 .authorityUrl(ServiceConstants.AUTHORITY_URL)
                 .redirectUri(ServiceConstants.REDIRECT_URI)
                 .clientId(ServiceConstants.CLIENT_ID);

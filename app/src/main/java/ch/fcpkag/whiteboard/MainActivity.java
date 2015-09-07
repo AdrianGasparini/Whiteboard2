@@ -8,18 +8,22 @@ import android.os.Bundle;
 
 import ch.fcpkag.whiteboard.inject.AppModule;
 
-public class DetailActivity extends BaseActivity {
+/*
+* The main activity of the app.
+* Creates a MainFragment.
+*/
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        System.out.println("*** DetailActivity.onCreate");
+        System.out.println("*** MainActivity.onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_main);
         if (null != getSupportActionBar()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         if (savedInstanceState == null) {
-            DetailFragment fragment = new DetailFragment();
+            MainFragment fragment = new MainFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.snippet_detail_container, fragment)
                     .commit();
@@ -34,9 +38,7 @@ public class DetailActivity extends BaseActivity {
 
         // drop the application shared preferences to clear any old auth tokens
         getSharedPreferences(AppModule.PREFS, MODE_PRIVATE)
-                .edit() // get the editor
-                .clear() // clear it
-                .apply(); // asynchronously apply
+                .edit().clear().commit();
         Intent login = new Intent(this, SignInActivity.class);
         login.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(login);

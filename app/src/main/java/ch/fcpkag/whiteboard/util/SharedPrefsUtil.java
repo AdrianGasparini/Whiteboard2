@@ -10,10 +10,13 @@ import com.microsoft.aad.adal.AuthenticationResult;
 import ch.fcpkag.whiteboard.application.WhiteboardApp;
 import ch.fcpkag.whiteboard.inject.AppModule;
 
+/*
+* Access to shared preferences
+*/
 public class SharedPrefsUtil {
 
-    public static final String PREF_AUTH_TOKEN = "PREF_AUTH_TOKEN";
-    public static final String PREF_AUTH_TOKEN2 = "PREF_AUTH_TOKEN2";
+    public static final String PREF_AUTH_TOKEN1 = "PREF_AUTH_TOKEN";    // for OneNote
+    public static final String PREF_AUTH_TOKEN2 = "PREF_AUTH_TOKEN2";   // for SharePoint
     public static final String PREF_SHAREPOINT_URL = "PREF_SHAREPOINT_URL";
     public static final String PREF_SITE = "PREF_SITE";
     public static final String PREF_NOTEBOOK = "PREF_NOTEBOOK";
@@ -25,12 +28,12 @@ public class SharedPrefsUtil {
         return WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
     }
 
-    public static void persistAuthToken(AuthenticationResult result) {
-        setAccessToken(result.getAccessToken());
+    public static void persistAuthToken1(AuthenticationResult result) {
+        setAccessToken1(result.getAccessToken());
     }
 
-    private static void setAccessToken(String accessToken) {
-        getSharedPreferences().edit().putString(PREF_AUTH_TOKEN, accessToken).commit();
+    private static void setAccessToken1(String accessToken) {
+        getSharedPreferences().edit().putString(PREF_AUTH_TOKEN1, accessToken).commit();
     }
 
     public static void persistAuthToken2(AuthenticationResult result) {

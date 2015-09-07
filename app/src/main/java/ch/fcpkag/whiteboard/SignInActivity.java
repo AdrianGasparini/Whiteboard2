@@ -20,6 +20,10 @@ import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
 
 import butterknife.ButterKnife;
 
+/*
+* In this activity the user provides the SharePoint URL
+* and logs in with his/her Office 365 Business account.
+*/
 public class SignInActivity
         extends BaseActivity
         implements AuthenticationCallback<AuthenticationResult> {
@@ -72,11 +76,13 @@ public class SignInActivity
 
     @Override
     public void onSuccess(final AuthenticationResult authenticationResult) {
+        System.out.println("*** SignInActivity.onSuccess 1");
         mAuthenticationManagers.mAuthenticationManager2.connect(new AuthenticationCallback<AuthenticationResult>() {
             @Override
             public void onSuccess(AuthenticationResult authenticationResult2) {
+                System.out.println("*** SignInActivity.onSuccess 2");
                 finish();
-                SharedPrefsUtil.persistAuthToken(authenticationResult);
+                SharedPrefsUtil.persistAuthToken1(authenticationResult);
                 SharedPrefsUtil.persistAuthToken2(authenticationResult2);
                 start();
             }
@@ -90,7 +96,7 @@ public class SignInActivity
     }
 
     private void start() {
-        Intent appLaunch = new Intent(this, DetailActivity.class);
+        Intent appLaunch = new Intent(this, MainActivity.class);
         startActivity(appLaunch);
     }
 

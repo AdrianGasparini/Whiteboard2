@@ -5,8 +5,8 @@ package ch.fcpkag.whiteboard.inject;
 
 import com.microsoft.AzureADModule;
 import ch.fcpkag.whiteboard.SignInActivity;
-import ch.fcpkag.whiteboard.DetailActivity;
-import ch.fcpkag.whiteboard.DetailFragment;
+import ch.fcpkag.whiteboard.MainActivity;
+import ch.fcpkag.whiteboard.MainFragment;
 
 import dagger.Module;
 
@@ -14,8 +14,8 @@ import dagger.Module;
         complete = false,
         injects = {
                 SignInActivity.class,
-                DetailActivity.class,
-                DetailFragment.class
+                MainActivity.class,
+                MainFragment.class
         }
 )
 public class AzureModule {

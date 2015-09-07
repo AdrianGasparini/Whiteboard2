@@ -20,6 +20,9 @@ import retrofit.RestAdapter;
 import retrofit.converter.Converter;
 import timber.log.Timber;
 
+/*
+* The Whiteboard app
+*/
 public class WhiteboardApp extends Application {
     /**
      * The {@link dagger.ObjectGraph} used by Dagger to fulfill <code>@inject</code> annotations
@@ -41,9 +44,6 @@ public class WhiteboardApp extends Application {
     @Inject
     public RestAdapter.LogLevel logLevel;
 
-    //@Inject
-    //public RequestInterceptor requestInterceptor;
-
     @Inject
     public RequestInterceptors mRequestInterceptors;
 
@@ -62,6 +62,7 @@ public class WhiteboardApp extends Application {
         return sWhiteboardApp;
     }
 
+    // get adapter for OneNote REST API
     public RestAdapter getRestAdapter() {
         return new RestAdapter.Builder()
                 .setEndpoint(endpoint)
@@ -71,6 +72,7 @@ public class WhiteboardApp extends Application {
                 .build();
     }
 
+    // get adapter for SharePoint REST API
     public RestAdapter getRestAdapter2() {
         SharedPreferences preferences
                 = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);

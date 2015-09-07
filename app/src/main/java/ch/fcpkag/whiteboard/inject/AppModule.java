@@ -55,7 +55,7 @@ public class AppModule {
                 final SharedPreferences preferences
                         = WhiteboardApp.getApp().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
                 final String token =
-                        preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN, null);
+                        preferences.getString(SharedPrefsUtil.PREF_AUTH_TOKEN1, null);
                 System.out.println("*** token1: " + token);
                 if (null != token) {
                     request.addHeader("Authorization", "Bearer " + token);

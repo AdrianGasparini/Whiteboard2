@@ -41,7 +41,6 @@ import com.google.gson.JsonObject;
 import com.microsoft.AuthenticationManagers;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
-import ch.fcpkag.whiteboard.R;
 import ch.fcpkag.whiteboard.application.WhiteboardApp;
 import ch.fcpkag.whiteboard.inject.AppModule;
 import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
@@ -106,18 +105,25 @@ import static ch.fcpkag.whiteboard.R.id.spinner0;
 import static ch.fcpkag.whiteboard.R.id.spinner;
 import static ch.fcpkag.whiteboard.R.id.spinner2;
 
-public class DetailFragment
+/*
+* The fragment of the main activity.
+*/
+public class MainFragment
         extends BaseFragment
         implements
         AuthenticationCallback<AuthenticationResult>, LocationListener {
 
+    // Instantiation of the REST APIs of OneNote and SharePoint
     public static class Services {
 
+        // OneNote REST APIs
         public final NotebooksService mNotebooksService;
         public final PagesService mPagesService;
         public final SectionGroupsService mSectionGroupsService;
         public final SectionsService mSectionsService;
         public final SiteMetadataService mSiteMetadataService;
+
+        // SharePoint REST API
         public final SitesService mSitesService;
 
         Services() {
@@ -162,7 +168,7 @@ public class DetailFragment
     protected Spinner mSpinner0;
 
     @InjectView(spinner)
-    protected Spinner mSpinner;
+    protected Spinner mSpinner1;
 
     @InjectView(spinner2)
     protected Spinner mSpinner2;
@@ -194,7 +200,7 @@ public class DetailFragment
     @Inject
     public AuthenticationManagers mAuthenticationManagers;
 
-    public DetailFragment() {
+    public MainFragment() {
     }
 
     @OnClick(btn_run)
@@ -633,7 +639,7 @@ public class DetailFragment
         System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
 
         mSpinner0.setVisibility(View.INVISIBLE);
-        mSpinner.setVisibility(View.INVISIBLE);
+        mSpinner1.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mGotoDefault = false;
         setUp(getSetUpCallback0());
@@ -660,7 +666,7 @@ public class DetailFragment
         SharedPreferences preferences
                 = WhiteboardApp.getApp().getSharedPreferences(AppModule.PREFS, Context.MODE_PRIVATE);
         preferences.edit().putString(SharedPrefsUtil.PREF_DEFAULT_SITE, mSpinner0.getSelectedItem().toString())
-                .putString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, mSpinner.getSelectedItem().toString()).apply();
+                .putString(SharedPrefsUtil.PREF_DEFAULT_NOTEBOOK, mSpinner1.getSelectedItem().toString()).apply();
 
         mGotoDefaultButton.setEnabled(true);
 
@@ -681,7 +687,7 @@ public class DetailFragment
         System.out.println("*** Selected spinners: " + sSiteName + " " + sNotebookName + " " + sSectionName);
 
         mSpinner0.setVisibility(View.INVISIBLE);
-        mSpinner.setVisibility(View.INVISIBLE);
+        mSpinner1.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mGotoDefault = true;
         setUp(getSetUpCallback0());
@@ -691,7 +697,7 @@ public class DetailFragment
     public void onSpinner0ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner0 selected: " + theSpinner.getSelectedItem().toString());
         mProgressbar.setVisibility(View.VISIBLE);
-        mSpinner.setVisibility(View.INVISIBLE);
+        mSpinner1.setVisibility(View.INVISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
         mPageId = null;
         mNewSectionButton.setEnabled(false);
@@ -723,7 +729,7 @@ public class DetailFragment
                         System.out.println("*** Site Collection ID and Site ID: " + siteMetadata.siteCollectionId + " " + siteMetadata.siteId);
                         mSiteCollectionId = siteMetadata.siteCollectionId;
                         mSiteId = siteMetadata.siteId;
-                        fillNotebookSpinner(sServices.mNotebooksService, getSetUpCallback(), notebookMap);
+                        fillNotebookSpinner(sServices.mNotebooksService, getSetUpCallback1(), notebookMap);
                     }
 
                     @Override
@@ -737,7 +743,7 @@ public class DetailFragment
     }
 
     @OnItemSelected(spinner)
-    public void onSpinnerItemSelected(Spinner theSpinner) {
+    public void onSpinner1ItemSelected(Spinner theSpinner) {
         System.out.println("*** Spinner selected: " + theSpinner.getSelectedItem().toString());
         mProgressbar.setVisibility(View.VISIBLE);
         mSpinner2.setVisibility(View.INVISIBLE);
@@ -843,7 +849,7 @@ public class DetailFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.inject(this, rootView);
         return rootView;
     }
@@ -905,14 +911,14 @@ public class DetailFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.snippet_list_menu, menu);
+        inflater.inflate(R.menu.main_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.disconnect == item.getItemId()) {
-            ((DetailActivity)getActivity()).onDisconnectClicked();
+            ((MainActivity)getActivity()).onDisconnectClicked();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -957,7 +963,7 @@ public class DetailFragment
         };
     }
 
-    private retrofit.Callback<String[]> getSetUpCallback() {
+    private retrofit.Callback<String[]> getSetUpCallback1() {
         return new retrofit.Callback<String[]>() {
             @Override
             public void success(String[] strings, Response response) {
@@ -966,12 +972,12 @@ public class DetailFragment
                 if (isAdded() && (null == response || strings.length > 0)) {
                     mNewSectionButton.setEnabled(true);
                     if (strings.length > 0) {
-                        populateSpinner(strings);
-                        mSpinner.setVisibility(VISIBLE);
+                        populateSpinner1(strings);
+                        mSpinner1.setVisibility(VISIBLE);
 
                         if(sNotebookName != null) {
-                            int pos = ((ArrayAdapter) mSpinner.getAdapter()).getPosition(sNotebookName);
-                            if(pos != -1) mSpinner.setSelection(pos, true);
+                            int pos = ((ArrayAdapter) mSpinner1.getAdapter()).getPosition(sNotebookName);
+                            if(pos != -1) mSpinner1.setSelection(pos, true);
                             sNotebookName = null;
                         }
                     }
@@ -1081,14 +1087,14 @@ public class DetailFragment
         mSpinner0.setAdapter(spinnerArrayAdapter);
     }
 
-    private void populateSpinner(String[] strings) {
+    private void populateSpinner1(String[] strings) {
         ArrayAdapter<String> spinnerArrayAdapter
                 = new ArrayAdapter<>(
                 getActivity(),
                 simple_spinner_item,
                 strings);
         spinnerArrayAdapter.setDropDownViewResource(simple_spinner_dropdown_item);
-        mSpinner.setAdapter(spinnerArrayAdapter);
+        mSpinner1.setAdapter(spinnerArrayAdapter);
     }
 
     private void populateSpinner2(String[] strings) {
@@ -1115,7 +1121,7 @@ public class DetailFragment
     @Override
     public void onSuccess(AuthenticationResult authenticationResult) {
         System.out.println("*** onSuccess");
-        SharedPrefsUtil.persistAuthToken(authenticationResult);
+        SharedPrefsUtil.persistAuthToken1(authenticationResult);
         mAuthenticationManagers.mAuthenticationManager2.connect(new AuthenticationCallback<AuthenticationResult>() {
             @Override
             public void onSuccess(AuthenticationResult authenticationResult) {
@@ -1127,7 +1133,7 @@ public class DetailFragment
             @Override
             public void onError(Exception e) {
                 System.out.println("*** onError 2: " + e);
-                DetailFragment.this.onError(e);
+                MainFragment.this.onError(e);
             }
         });
     }
@@ -1137,7 +1143,7 @@ public class DetailFragment
             setupDidRun = true;
             mProgressbar.setVisibility(View.VISIBLE);
             mSpinner0.setVisibility(View.INVISIBLE);
-            mSpinner.setVisibility(View.INVISIBLE);
+            mSpinner1.setVisibility(View.INVISIBLE);
             mSpinner2.setVisibility(View.INVISIBLE);
 
             SharedPreferences preferences
@@ -1177,7 +1183,7 @@ public class DetailFragment
     }
 
     /**
-     * Returns the version segment of the endpoint url (Office 365, MSA)
+     * Returns the version segment of the endpoint url
      *
      * @return the version of the endpoint to use
      */

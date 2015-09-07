@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.fcpkag.whiteboard.DetailActivity"
+            android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_snippet_detail"
             android:parentActivityName="ch.fcpkag.whiteboard.SignInActivity">
