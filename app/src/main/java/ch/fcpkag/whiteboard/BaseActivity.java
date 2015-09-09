@@ -18,6 +18,9 @@ import ch.fcpkag.whiteboard.inject.ObjectGraphInjector;
 
 import dagger.ObjectGraph;
 
+/**
+ * Initialization of activities
+ */
 public abstract class BaseActivity
         extends AzureAppCompatActivity
         implements ObjectGraphInjector {

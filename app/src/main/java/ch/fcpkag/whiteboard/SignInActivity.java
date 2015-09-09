@@ -20,14 +20,15 @@ import ch.fcpkag.whiteboard.util.SharedPrefsUtil;
 
 import butterknife.ButterKnife;
 
-/*
-* In this activity the user provides the SharePoint URL
-* and logs in with his/her Office 365 Business account.
-*/
+/**
+ * In this activity the user provides the SharePoint URL
+ * and logs in with his/her Office 365 Business account.
+ */
 public class SignInActivity
         extends BaseActivity
         implements AuthenticationCallback<AuthenticationResult> {
 
+    // Prompts the user for the SharePoint URL (if not yet set) and authenticates the user
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         System.out.println("*** SignInActivity.onCreate");
@@ -74,6 +75,7 @@ public class SignInActivity
         }
     }
 
+    // On successful authentication, set tokens
     @Override
     public void onSuccess(final AuthenticationResult authenticationResult) {
         System.out.println("*** SignInActivity.onSuccess 1");

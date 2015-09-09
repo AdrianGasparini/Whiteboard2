@@ -8,10 +8,10 @@ import android.os.Bundle;
 
 import ch.fcpkag.whiteboard.inject.AppModule;
 
-/*
-* The main activity of the app.
-* Creates a MainFragment.
-*/
+/**
+ * The main activity of the app.
+ * Creates a MainFragment.
+ */
 public class MainActivity extends BaseActivity {
 
     @Override

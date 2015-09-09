@@ -74,6 +74,7 @@ public class AuthenticationManager {
         removeUserId();
     }
 
+    // Authenticate user, display error msg in case of failure
     private void authenticatePrompt(
             final AuthenticationCallback<AuthenticationResult> authenticationCallback) {
         mAuthenticationContext

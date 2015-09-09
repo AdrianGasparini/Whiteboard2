@@ -10,9 +10,9 @@ import com.microsoft.aad.adal.AuthenticationResult;
 import ch.fcpkag.whiteboard.application.WhiteboardApp;
 import ch.fcpkag.whiteboard.inject.AppModule;
 
-/*
-* Access to shared preferences
-*/
+/**
+ * Access to shared preferences
+ */
 public class SharedPrefsUtil {
 
     public static final String PREF_AUTH_TOKEN1 = "PREF_AUTH_TOKEN";    // for OneNote

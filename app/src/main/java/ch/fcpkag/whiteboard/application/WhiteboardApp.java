@@ -20,9 +20,9 @@ import retrofit.RestAdapter;
 import retrofit.converter.Converter;
 import timber.log.Timber;
 
-/*
-* The Whiteboard app
-*/
+/**
+ * The Whiteboard app
+ */
 public class WhiteboardApp extends Application {
     /**
      * The {@link dagger.ObjectGraph} used by Dagger to fulfill <code>@inject</code> annotations

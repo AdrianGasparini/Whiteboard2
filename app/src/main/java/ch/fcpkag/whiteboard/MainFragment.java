@@ -105,9 +105,9 @@ import static ch.fcpkag.whiteboard.R.id.spinner0;
 import static ch.fcpkag.whiteboard.R.id.spinner;
 import static ch.fcpkag.whiteboard.R.id.spinner2;
 
-/*
-* The fragment of the main activity.
-*/
+/**
+ * The fragment of the main activity.
+ */
 public class MainFragment
         extends BaseFragment
         implements
@@ -414,6 +414,7 @@ public class MainFragment
         }
     }
 
+    // Create an image file with timestamp as name
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -448,6 +449,7 @@ public class MainFragment
         return simpleHtml;
     }
 
+    // "New section" button handling
     @OnClick(btn_new_section)
     public void onNewSectionClicked(Button btn) {
         String eventTitle = null;
@@ -614,6 +616,7 @@ public class MainFragment
         };
     }
 
+    // "Open in OneNote" button handling
     @OnClick(btn_open_onenote)
     public void onOpenOneNoteClicked(Button btn) {
         System.out.println("*** onOpenOneNoteClicked");
@@ -626,6 +629,7 @@ public class MainFragment
         startActivity(browserIntent);
     }
 
+    // "Refresh" button handling
     @OnClick(btn_refresh)
     public void onRefreshClicked(Button btn) {
         System.out.println("*** onRefreshClicked");
@@ -645,6 +649,7 @@ public class MainFragment
         setUp(getSetUpCallback0());
     }
 
+    // "Pick Photos" button handling
     @OnClick(btn_pick_photos)
     public void onPickPhotosClicked(Button btn) {
         System.out.println("*** onPickPhotosClicked");
@@ -659,6 +664,7 @@ public class MainFragment
         startActivityForResult(Intent.createChooser(intent, "Select Pictures"), PICK_IMAGES);
     }
 
+    // "Set default Notebook" button handling
     @OnClick(btn_set_default)
     public void onSetDefaultClicked(Button btn) {
         System.out.println("*** onSetDefaultClicked");
@@ -674,6 +680,7 @@ public class MainFragment
         toast.show();
     }
 
+    // "New section in default Notebook" button handling
     @OnClick(btn_goto_default)
     public void onGotoDefaultClicked(Button btn) {
         System.out.println("*** onGotoDefaultClicked");
